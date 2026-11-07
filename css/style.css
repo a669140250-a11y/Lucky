@@ -62,7 +62,6 @@ body {
   font-family: var(--font);
   color: var(--ink);
   background: var(--bg);
-  transition: background-color .6s ease;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
 }
@@ -95,10 +94,18 @@ button {
 .bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
 }
+.bg-layer {
+  position: absolute;
+  inset: 0;
+  transition: opacity .6s ease;
+}
+.bg-daily { --b1: #FFC23C; --b2: #FF9EB5; --b3: #FFB36B; background: #FFF4E8; }
+.bg-party { --b1: #9F8CFF; --b2: #FF9ED8; --b3: #7FD3FF; background: #F1EDFF; opacity: 0; }
+body[data-mode="party"] .bg-party { opacity: 1; }
 .bg::after {
   content: "";
   position: absolute;
@@ -109,14 +116,17 @@ button {
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(60px);
-  opacity: .55;
-  transition: background-color .8s ease;
+  opacity: .6;
+  will-change: transform;
   animation: float 18s ease-in-out infinite alternate;
 }
-.b1 { width: 60vmax; height: 60vmax; top: -28vmax; left: -22vmax; background: var(--blob-1); }
-.b2 { width: 52vmax; height: 52vmax; bottom: -24vmax; right: -22vmax; background: var(--blob-2); animation-duration: 22s; }
-.b3 { width: 34vmax; height: 34vmax; top: 38%; left: 58%; background: var(--blob-3); animation-duration: 26s; opacity: .4; }
+.b1 { width: 80vmax; height: 80vmax; top: -38vmax; left: -32vmax; background: radial-gradient(circle closest-side, var(--b1) 30%, transparent); }
+.b2 { width: 72vmax; height: 72vmax; bottom: -34vmax; right: -32vmax; background: radial-gradient(circle closest-side, var(--b2) 30%, transparent); animation-duration: 22s; }
+.b3 { width: 50vmax; height: 50vmax; top: 30%; left: 48%; background: radial-gradient(circle closest-side, var(--b3) 25%, transparent); animation-duration: 26s; opacity: .45; }
+/* 看不到的那組背景、以及打開題庫時，先暫停背景動畫 */
+body:not([data-mode="party"]) .bg-party .blob,
+body[data-mode="party"] .bg-daily .blob,
+html:has(dialog[open]) .blob { animation-play-state: paused; }
 
 @keyframes float {
   to { transform: translate(5vmax, 4vmax) scale(1.12); }
@@ -124,6 +134,8 @@ button {
 
 /* ---------- 版面 ---------- */
 .app {
+  position: relative;
+  z-index: 1;
   max-width: 520px;
   margin: 0 auto;
   padding: calc(14px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
@@ -198,9 +210,7 @@ main { flex: 1; }
   grid-template-columns: 1fr 1fr;
   padding: 6px;
   margin: 18px 0 6px;
-  background: rgba(255, 255, 255, .72);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, .82);
   border-radius: 22px;
   box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(255, 255, 255, .8);
 }
@@ -313,7 +323,6 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 .btn-ghost:hover { background: #fff; }
 .btn-ghost.danger { color: #D62F45; }
 .btn:disabled { cursor: default; }
-.btn.is-busy { pointer-events: none; }
 
 .stat, .hint {
   text-align: center;
@@ -356,7 +365,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   position: relative;
   z-index: 1;
   min-height: clamp(270px, 42vh, 350px);
-  min-height: clamp(270px, 42dvh, 350px);
+  min-height: clamp(270px, 42svh, 350px);
   padding: 22px 22px 58px;
   background: var(--card);
   border-radius: 28px;
@@ -537,7 +546,6 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   display: flex;
   justify-content: center;
   margin-top: 20px;
-  perspective: 1400px;
 }
 .flip-card {
   --c1: var(--truth-1);
@@ -545,34 +553,37 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   position: relative;
   width: min(100%, 340px);
   height: clamp(270px, 40vh, 400px);
-  height: clamp(270px, 40dvh, 400px);
+  height: clamp(270px, 40svh, 400px);
   border-radius: 28px;
   cursor: pointer;
   outline-offset: 6px;
+  perspective: 1200px;
+  transition: transform .3s var(--ease-spring);
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 .flip-card[data-type="dare"] { --c1: var(--dare-1); --c2: var(--dare-2); }
-.flip-card.is-lifting { animation: lift .8s ease; }
+@media (hover: hover) {
+  .flip-card:not(.is-flipped):not(.is-turning):hover { transform: translateY(-5px) rotate(-1.5deg); }
+}
 
 .flip-inner {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  transition: transform .8s cubic-bezier(.45, .05, .25, 1.2);
-}
-@media (hover: hover) {
-  .flip-card:not(.is-flipped):hover .flip-inner { transform: rotateY(-8deg) rotateX(4deg); }
+  will-change: transform;
 }
 .flip-card.is-flipped .flip-inner { transform: rotateY(180deg); }
-.flip-card.is-quick .flip-inner { transition-duration: .45s; transition-timing-function: ease-in; }
 
-/* 翻完後把背對我們的那一面完全藏起來，避免殘影透到另一面
-   （部分手機瀏覽器的 backface-visibility 對有動畫的子元素不可靠） */
-.face-cover { transition: visibility 0s; }
-.flip-card.is-flipped .face-cover { visibility: hidden; transition-delay: .8s; }
-.flip-card.is-flipped .cover-ring { animation: none; }
-.face-content { visibility: hidden; transition: visibility 0s .8s; }
-.flip-card.is-quick .face-content { transition-delay: .45s; }
-.flip-card.is-flipped .face-content { visibility: visible; transition-delay: 0s; }
+/* 停下來時把背對我們的那一面完全藏起來，避免殘影透到另一面
+   （部分手機瀏覽器的 backface-visibility 對有動畫的子元素不可靠）；翻動中兩面都要在 */
+.face-content { visibility: hidden; }
+.flip-card.is-flipped .face-content { visibility: visible; }
+.flip-card.is-flipped .face-cover { visibility: hidden; }
+.flip-card.is-turning .face { visibility: visible; }
+.flip-card.is-flipped .cover-ring,
+.flip-card.is-turning .cover-ring { animation: none; }
 
 .face {
   position: absolute;
@@ -686,10 +697,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 }
 
 @keyframes pulse {
-  50% { transform: scale(1.06); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .9), 0 14px 36px rgba(0, 0, 0, .16); }
-}
-@keyframes lift {
-  45% { transform: translateY(-14px) scale(1.05); }
+  50% { transform: scale(1.06); }
 }
 
 .foot {
@@ -722,9 +730,7 @@ body[data-mode="party"] .sheet { background: #FAF8FF; }
 }
 .sheet.is-closing { animation: sheetOut .24s ease-in forwards; }
 .sheet::backdrop {
-  background: rgba(30, 20, 60, .45);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
+  background: rgba(30, 20, 60, .5);
 }
 @keyframes sheetIn { from { transform: translateY(100%); } }
 @keyframes sheetOut { to { transform: translateY(100%); } }

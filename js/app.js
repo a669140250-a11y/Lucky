@@ -183,22 +183,8 @@
     }
   }
 
-  function waitTransition(el, prop, maxMs) {
-    if (reduceMotion.matches) return wait(20);
-    return new Promise(function (resolve) {
-      var done = false;
-      function finish() {
-        if (done) return;
-        done = true;
-        el.removeEventListener('transitionend', onEnd);
-        resolve();
-      }
-      function onEnd(e) {
-        if (e.target === el && e.propertyName === prop) finish();
-      }
-      el.addEventListener('transitionend', onEnd);
-      setTimeout(finish, maxMs);
-    });
+  function stopAnimations(el) {
+    if (el.getAnimations) el.getAnimations().forEach(function (a) { a.cancel(); });
   }
 
   function vibrate(pattern) {
@@ -317,9 +303,10 @@
 
   /* ---------------- 現在幹嘛 ---------------- */
   var taskCard = $('#taskCard');
+  var taskEmoji = $('#taskEmoji');
   var drawDailyBtn = $('#drawDaily');
   var doneBtn = $('#doneDaily');
-  var dailyBusy = false;
+  var dailyToken = 0;       // 每抽一次 +1；舊的動畫看到號碼不同就自動退場
   var dailyHasCard = false;
 
   function categoryColor(cat) {
@@ -329,7 +316,7 @@
   function renderTask(item) {
     taskCard.classList.remove('is-empty', 'is-done');
     taskCard.style.setProperty('--cat', categoryColor(item.cat));
-    $('#taskEmoji').textContent = item.emoji;
+    taskEmoji.textContent = item.emoji;
     $('#taskCat').textContent = item.custom ? '✏️ 自訂' : '#' + item.cat;
     var time = $('#taskTime');
     time.hidden = !item.minutes;
@@ -338,39 +325,49 @@
   }
 
   function drawDaily() {
-    if (dailyBusy) return;
-    dailyBusy = true;
-    drawDailyBtn.classList.add('is-busy');
-    vibrate(12);
-
+    var token = ++dailyToken;
     var item = drawItem('daily');
-    var leave = dailyHasCard
-      ? animate(taskCard, [
-          { transform: 'none', opacity: 1 },
-          { transform: 'translate(-40%, 10px) rotate(-14deg) scale(.92)', opacity: 0 }
-        ], { duration: 260, easing: 'cubic-bezier(.5, 0, .9, .4)', fill: 'forwards' })
-      : animate(taskCard, [
-          { transform: 'none' },
-          { transform: 'scale(.94) rotate(-2deg)' }
-        ], { duration: 140, easing: 'ease-in', fill: 'forwards' });
+    vibrate(10);
 
-    leave.then(function () {
+    // 從卡片「現在的樣子」開始退場，就算上一張還在飛也不會跳一下
+    var cs = getComputedStyle(taskCard);
+    var from = { transform: cs.transform, opacity: cs.opacity };
+    stopAnimations(taskCard);
+
+    var exit = dailyHasCard
+      ? animate(taskCard, [
+          from,
+          { transform: 'translate(-30%, 6px) rotate(-9deg) scale(.94)', opacity: 0 }
+        ], { duration: 170, easing: 'cubic-bezier(.5, 0, .75, 0)', fill: 'forwards' })
+      : animate(taskCard, [
+          from,
+          { transform: 'scale(.95) rotate(-1.5deg)', opacity: 1 }
+        ], { duration: 110, easing: 'ease-in', fill: 'forwards' });
+
+    exit.then(function () {
+      if (token !== dailyToken) return;
       renderTask(item);
-      return animate(taskCard, [
-        { transform: 'translateY(46px) rotate(7deg) scale(.82)', opacity: 0 },
-        { transform: 'translateY(-8px) rotate(-1.5deg) scale(1.03)', opacity: 1, offset: 0.65 },
-        { transform: 'none', opacity: 1 }
-      ], { duration: 560, easing: 'cubic-bezier(.2, .8, .3, 1)' });
-    }).then(function () {
-      if (taskCard.getAnimations) taskCard.getAnimations().forEach(function (a) { a.cancel(); });
       dailyHasCard = true;
-      dailyBusy = false;
-      drawDailyBtn.classList.remove('is-busy');
       $('.btn-label', drawDailyBtn).textContent = '再抽一張';
       doneBtn.hidden = false;
       doneBtn.disabled = false;
       $('.btn-label', doneBtn).textContent = '完成了！';
       announce('抽到任務：' + item.text);
+
+      stopAnimations(taskEmoji);
+      animate(taskEmoji, [
+        { transform: 'scale(.3) rotate(-25deg)' },
+        { transform: 'scale(1.12) rotate(6deg)', offset: 0.6 },
+        { transform: 'none' }
+      ], { duration: 520, delay: 80, easing: 'cubic-bezier(.3, .8, .4, 1)', fill: 'backwards' });
+
+      return animate(taskCard, [
+        { transform: 'translateY(34px) rotate(5deg) scale(.88)', opacity: 0 },
+        { transform: 'translateY(-5px) rotate(-1deg) scale(1.015)', opacity: 1, offset: 0.62 },
+        { transform: 'none', opacity: 1 }
+      ], { duration: 440, easing: 'cubic-bezier(.25, .8, .35, 1)' }).then(function () {
+        if (token === dailyToken) stopAnimations(taskCard);
+      });
     });
   }
 
@@ -402,9 +399,20 @@
   var faceCover = $('.face-cover', flipCard);
   var faceContent = $('#faceContent');
   var drawPartyBtn = $('#drawParty');
-  var partyBusy = false;
-  var flipped = false;
+  var flipped = false;      // 目前停在題目面
+  var spinning = false;     // 翻牌動畫進行中
+  var queuedDraw = false;   // 動畫中又按了一次 → 這次翻完馬上再抽
+  var shown = null;         // 題目面上那題的 { type, level }
   var partyCount = 0;
+
+  var SPIN = {
+    // 背面 → 題目：最後帶一點點回彈
+    reveal: { from: 0, to: 180, duration: 620, easing: 'cubic-bezier(.3, .9, .35, 1.06)' },
+    // 題目 → 轉一整圈 → 新題目：曲線必須前後對稱，轉到一半時剛好背面朝前，在那一刻換題
+    redraw: { from: 180, to: 540, duration: 760, easing: 'cubic-bezier(.65, 0, .35, 1)' },
+    // 題目 → 背面
+    hide: { from: 180, to: 0, duration: 420, easing: 'cubic-bezier(.5, 0, .3, 1)' }
+  };
 
   function setFlipped(value) {
     flipped = value;
@@ -426,46 +434,97 @@
     $('#coverSub').textContent = LABEL[settings.level] + ' · 點我翻牌';
   }
 
-  function flipBack() {
-    flipCard.classList.add('is-quick');
-    setFlipped(false);
-    return waitTransition(flipInner, 'transform', 520).then(function () {
-      flipCard.classList.remove('is-quick');
-    });
+  function spin(cfg, atMidpoint) {
+    spinning = true;
+    var swapped = false;
+    var swap = function () {
+      if (swapped || !atMidpoint) return;
+      swapped = true;
+      atMidpoint();
+    };
+    var finish = function () {
+      swap();
+      setFlipped(cfg.to % 360 === 180);
+      flipCard.classList.remove('is-turning');
+      stopAnimations(flipInner);
+      spinning = false;
+    };
+
+    if (!flipInner.animate || reduceMotion.matches) {
+      finish();
+      return Promise.resolve();
+    }
+
+    flipCard.classList.add('is-turning');
+    var anim = flipInner.animate([
+      { transform: 'rotateY(' + cfg.from + 'deg)' },
+      { transform: 'rotateY(' + cfg.to + 'deg)' }
+    ], { duration: cfg.duration, easing: cfg.easing, fill: 'forwards' });
+    flipCard.animate([
+      { transform: 'none' },
+      { transform: 'translateY(-10px) scale(1.035)', offset: 0.5 },
+      { transform: 'none' }
+    ], { duration: cfg.duration, easing: 'ease-in-out' });
+
+    if (atMidpoint) {
+      var watch = function () {
+        if (swapped) return;
+        if (anim.currentTime >= cfg.duration / 2) swap();
+        else requestAnimationFrame(watch);
+      };
+      requestAnimationFrame(watch);
+    }
+    return anim.finished.catch(function () {}).then(finish);
+  }
+
+  function showQuestion(item, type, level, count) {
+    shown = { type: type, level: level };
+    faceContent.dataset.qtype = type;
+    $('#qType').textContent = LABEL[type];
+    $('#qLevel').textContent = LABEL[level];
+    $('#qCustom').hidden = !item.custom;
+    $('#qText').textContent = item.text;
+    $('#qFoot').textContent = 'No. ' + String(count).padStart(2, '0');
   }
 
   function drawParty() {
-    if (partyBusy) return;
-    partyBusy = true;
-    drawPartyBtn.classList.add('is-busy');
+    if (spinning) {
+      queuedDraw = true;
+      return;
+    }
+    var type = settings.type;
+    var level = settings.level;
+    var item = drawItem(type, level);
+    var count = ++partyCount;
+    var fill = function () { showQuestion(item, type, level, count); };
+    vibrate(12);
+    $('.btn-label', drawPartyBtn).textContent = '再抽一張';
+    announce(NAME[type] + '：' + item.text);
 
-    var ready = flipped ? flipBack() : Promise.resolve();
-    ready.then(function () {
-      var type = settings.type;
-      var level = settings.level;
-      var item = drawItem(type, level);
-      partyCount += 1;
+    var done;
+    if (flipped) {
+      done = spin(SPIN.redraw, fill);
+    } else {
+      fill();
+      done = spin(SPIN.reveal);
+    }
+    done.then(afterSpin);
+  }
 
-      faceContent.dataset.qtype = type;
-      $('#qType').textContent = LABEL[type];
-      $('#qLevel').textContent = LABEL[level];
-      $('#qCustom').hidden = !item.custom;
-      $('#qText').textContent = item.text;
-      $('#qFoot').textContent = 'No. ' + String(partyCount).padStart(2, '0');
+  function hideCard() {
+    if (!flipped || spinning) return;
+    $('.btn-label', drawPartyBtn).textContent = '翻牌！';
+    spin(SPIN.hide).then(afterSpin);
+  }
 
-      vibrate(15);
-      flipCard.classList.remove('is-lifting');
-      void flipCard.offsetWidth;
-      flipCard.classList.add('is-lifting');
-      setFlipped(true);
-      announce(NAME[type] + '：' + item.text);
-      return waitTransition(flipInner, 'transform', 900);
-    }).then(function () {
-      flipCard.classList.remove('is-lifting');
-      partyBusy = false;
-      drawPartyBtn.classList.remove('is-busy');
-      $('.btn-label', drawPartyBtn).textContent = '再抽一張';
-    });
+  function afterSpin() {
+    if (queuedDraw) {
+      queuedDraw = false;
+      drawParty();
+      return;
+    }
+    // 翻牌途中換了類型或尺度 → 翻完後收回背面
+    if (flipped && shown && (shown.type !== settings.type || shown.level !== settings.level)) hideCard();
   }
 
   function choose(key, value) {
@@ -474,10 +533,7 @@
     saveSettings();
     renderPicker();
     // 換類型或尺度時，把牌翻回背面，等待下一次翻牌
-    if (flipped && !partyBusy) {
-      flipBack();
-      $('.btn-label', drawPartyBtn).textContent = '翻牌！';
-    }
+    if (flipped && !spinning) hideCard();
   }
 
   $$('.type-tile').forEach(function (btn) {
