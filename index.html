@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="zh-Hant-TW">
+<html lang="zh-Hans">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#F26A1B">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="現在幹嘛？真心話還是大冒險？交給 Lucky 幫你抽一張！">
+  <meta name="description" content="现在干嘛？真心话还是大冒险？交给 Lucky 帮你抽一张！">
   <title>Lucky 抽一下</title>
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -28,74 +28,74 @@
         <span class="brand-name">Lucky<small>抽一下</small></span>
       </div>
       <button class="pill-btn" id="openBank" type="button">
-        <span aria-hidden="true">📝</span> 自訂題庫
+        <span aria-hidden="true">📝</span> 自定义题库
       </button>
     </header>
 
-    <div class="mode-switch" role="tablist" aria-label="模式切換">
+    <div class="mode-switch" role="tablist" aria-label="模式切换">
       <span class="mode-indicator" aria-hidden="true"></span>
       <button class="mode-tab" id="tab-daily" type="button" role="tab" data-mode="daily"
               aria-controls="panel-daily" aria-selected="true">
         <span class="mode-emoji" aria-hidden="true">☀️</span>
-        <span class="mode-text"><strong>現在幹嘛</strong><small>單人日常靈感</small></span>
+        <span class="mode-text"><strong>现在干嘛</strong><small>单人日常灵感</small></span>
       </button>
       <button class="mode-tab" id="tab-party" type="button" role="tab" data-mode="party"
               aria-controls="panel-party" aria-selected="false" tabindex="-1">
         <span class="mode-emoji" aria-hidden="true">🎉</span>
-        <span class="mode-text"><strong>真心話大冒險</strong><small>多人聚會</small></span>
+        <span class="mode-text"><strong>真心话大冒险</strong><small>多人聚会</small></span>
       </button>
     </div>
 
     <main>
-      <!-- 現在幹嘛 -->
+      <!-- 现在干嘛 -->
       <section class="panel" id="panel-daily" role="tabpanel" aria-labelledby="tab-daily">
         <div class="panel-head">
-          <h1>現在，來點小任務？</h1>
-          <p>抽一張日常微任務，給生活一點小驚喜</p>
+          <h1>现在，来点小任务？</h1>
+          <p>抽一张日常微任务，给生活一点小惊喜</p>
         </div>
 
         <div class="deck">
           <article class="task-card is-empty" id="taskCard">
             <div class="task-meta">
-              <span class="chip" id="taskCat">分類</span>
-              <span class="chip chip-time" id="taskTime">⏱ 1 分鐘</span>
+              <span class="chip" id="taskCat">分类</span>
+              <span class="chip chip-time" id="taskTime">⏱ 1 分钟</span>
             </div>
             <div class="task-emoji" id="taskEmoji" aria-hidden="true">🎁</div>
-            <p class="task-text" id="taskText">按下面的按鈕，抽出今天的第一個小任務！</p>
+            <p class="task-text" id="taskText">按下面的按钮，抽出今天的第一个小任务！</p>
             <span class="stamp" aria-hidden="true">DONE!</span>
           </article>
         </div>
 
         <div class="actions">
           <button class="btn btn-primary btn-xl" id="drawDaily" type="button">
-            <span aria-hidden="true">🎲</span><span class="btn-label">抽一張</span>
+            <span aria-hidden="true">🎲</span><span class="btn-label">抽一张</span>
           </button>
           <button class="btn btn-soft" id="doneDaily" type="button" hidden>
             <span aria-hidden="true">✅</span><span class="btn-label">完成了！</span>
           </button>
         </div>
-        <p class="stat">已完成 <b id="doneCount">0</b> 個小任務</p>
+        <p class="stat">已完成 <b id="doneCount">0</b> 个小任务</p>
       </section>
 
-      <!-- 真心話大冒險 -->
+      <!-- 真心话大冒险 -->
       <section class="panel" id="panel-party" role="tabpanel" aria-labelledby="tab-party" hidden>
         <div class="panel-head">
-          <h1>真心話 or 大冒險？</h1>
-          <p>選好類型和尺度，翻開命運的那張牌</p>
+          <h1>真心话 or 大冒险？</h1>
+          <p>选好类型和尺度，翻开命运的那张牌</p>
         </div>
 
         <div class="picker">
-          <div class="type-picker" role="group" aria-label="題目類型">
+          <div class="type-picker" role="group" aria-label="题目类型">
             <button class="type-tile" type="button" data-type="truth" aria-pressed="true">
-              <span class="t-emoji" aria-hidden="true">💬</span><span class="t-text"><b>真心話</b><small>Truth</small></span>
+              <span class="t-emoji" aria-hidden="true">💬</span><span class="t-text"><b>真心话</b><small>Truth</small></span>
             </button>
             <button class="type-tile" type="button" data-type="dare" aria-pressed="false">
-              <span class="t-emoji" aria-hidden="true">🔥</span><span class="t-text"><b>大冒險</b><small>Dare</small></span>
+              <span class="t-emoji" aria-hidden="true">🔥</span><span class="t-text"><b>大冒险</b><small>Dare</small></span>
             </button>
           </div>
-          <div class="seg level-picker" role="group" aria-label="尺度等級">
+          <div class="seg level-picker" role="group" aria-label="尺度等级">
             <button type="button" data-level="normal" aria-pressed="true">🌱 普通</button>
-            <button type="button" data-level="advanced" aria-pressed="false">🌶️ 進階</button>
+            <button type="button" data-level="advanced" aria-pressed="false">🌶️ 进阶</button>
           </div>
         </div>
 
@@ -104,14 +104,14 @@
             <div class="flip-inner">
               <div class="face face-cover">
                 <div class="cover-ring"><span class="cover-q">?</span></div>
-                <p class="cover-title" id="coverTitle">真心話</p>
-                <p class="cover-sub" id="coverSub">🌱 普通 · 點我翻牌</p>
+                <p class="cover-title" id="coverTitle">真心话</p>
+                <p class="cover-sub" id="coverSub">🌱 普通 · 点我翻牌</p>
               </div>
               <div class="face face-content" id="faceContent" data-qtype="truth" aria-hidden="true">
                 <div class="content-badges">
-                  <span class="badge" id="qType">💬 真心話</span>
+                  <span class="badge" id="qType">💬 真心话</span>
                   <span class="badge" id="qLevel">🌱 普通</span>
-                  <span class="badge badge-custom" id="qCustom" hidden>✏️ 自訂</span>
+                  <span class="badge badge-custom" id="qCustom" hidden>✏️ 自定义</span>
                 </div>
                 <p class="q-text" id="qText"></p>
                 <p class="q-foot" id="qFoot">No. 01</p>
@@ -125,59 +125,59 @@
             <span aria-hidden="true">🃏</span><span class="btn-label">翻牌！</span>
           </button>
         </div>
-        <p class="hint">玩得開心也要尊重彼此，任何人都可以說「Pass」🙌</p>
+        <p class="hint">玩得开心也要尊重彼此，任何人都可以说“Pass”🙌</p>
       </section>
     </main>
 
-    <footer class="foot">自訂題目只存在這台裝置的瀏覽器裡，記得偶爾匯出備份 💾</footer>
+    <footer class="foot">自定义题目只存在这台设备的浏览器里，记得偶尔导出备份 💾</footer>
   </div>
 
-  <!-- 自訂題庫 -->
+  <!-- 自定义题库 -->
   <dialog class="sheet" id="bankSheet" aria-labelledby="bankTitle">
     <div class="sheet-head">
-      <h2 id="bankTitle">📝 自訂題庫</h2>
-      <button class="close-btn" id="closeBank" type="button" aria-label="關閉">✕</button>
+      <h2 id="bankTitle">📝 自定义题库</h2>
+      <button class="close-btn" id="closeBank" type="button" aria-label="关闭">✕</button>
     </div>
 
     <div class="sheet-body">
-      <div class="seg seg-cat" id="bankCatSeg" role="group" aria-label="題庫分類">
-        <button type="button" data-cat="daily">☀️ 現在幹嘛</button>
-        <button type="button" data-cat="truth">💬 真心話</button>
-        <button type="button" data-cat="dare">🔥 大冒險</button>
+      <div class="seg seg-cat" id="bankCatSeg" role="group" aria-label="题库分类">
+        <button type="button" data-cat="daily">☀️ 现在干嘛</button>
+        <button type="button" data-cat="truth">💬 真心话</button>
+        <button type="button" data-cat="dare">🔥 大冒险</button>
       </div>
-      <div class="seg" id="bankLevelSeg" role="group" aria-label="尺度等級">
+      <div class="seg" id="bankLevelSeg" role="group" aria-label="尺度等级">
         <button type="button" data-level="normal">🌱 普通</button>
-        <button type="button" data-level="advanced">🌶️ 進階</button>
+        <button type="button" data-level="advanced">🌶️ 进阶</button>
       </div>
 
       <form class="add-form" id="addForm">
-        <label class="sr-only" for="addInput">新增題目</label>
+        <label class="sr-only" for="addInput">添加题目</label>
         <textarea id="addInput" rows="3" maxlength="3000"></textarea>
         <div class="add-row">
-          <small>一行一題，可以一次貼上很多題</small>
-          <button class="btn btn-primary" type="submit">＋ 新增</button>
+          <small>一行一题，可以一次粘贴很多题</small>
+          <button class="btn btn-primary" type="submit">＋ 添加</button>
         </div>
       </form>
 
       <div class="list-head">
-        <h3>我的題目 <span class="count" id="bankCount">0</span></h3>
+        <h3>我的题目 <span class="count" id="bankCount">0</span></h3>
         <span class="muted" id="builtinCount"></span>
       </div>
       <ul class="bank-list" id="bankList"></ul>
-      <p class="empty" id="bankEmpty">還沒有自訂題目，寫下你的第一題吧 ✍️</p>
+      <p class="empty" id="bankEmpty">还没有自定义题目，写下你的第一题吧 ✍️</p>
 
       <label class="switch-row">
         <span>
-          <b>只抽我的自訂題目</b>
-          <small>開啟後只從自訂題庫抽；若該分類還沒有自訂題目，會先用內建題庫。</small>
+          <b>只抽我的自定义题目</b>
+          <small>打开后只从自定义题库抽；若该分类还没有自定义题目，会先用内置题库。</small>
         </span>
         <input type="checkbox" class="switch" id="onlyCustom">
       </label>
 
       <div class="bank-tools">
-        <button class="btn btn-ghost" id="exportBank" type="button">⬇️ 匯出備份</button>
-        <button class="btn btn-ghost" id="importBank" type="button">⬆️ 匯入</button>
-        <button class="btn btn-ghost danger" id="clearCat" type="button">🗑️ 清空此分類</button>
+        <button class="btn btn-ghost" id="exportBank" type="button">⬇️ 导出备份</button>
+        <button class="btn btn-ghost" id="importBank" type="button">⬆️ 导入</button>
+        <button class="btn btn-ghost danger" id="clearCat" type="button">🗑️ 清空此分类</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
       </div>
     </div>

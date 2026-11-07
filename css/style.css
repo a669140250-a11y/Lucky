@@ -1,10 +1,10 @@
 /* =========================================================
-   Lucky 抽一下 — 樣式
+   Lucky 抽一下 — 样式
    ========================================================= */
 
 :root {
-  --font: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC",
-          "Microsoft JhengHei", "Segoe UI", Roboto, sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Source Han Sans SC",
+          "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
   --font-fun: "Fredoka", var(--font);
 
   --ink: #2A2140;
@@ -22,7 +22,7 @@
   --dare-1: #FF4D7E;
   --dare-2: #FF9A3D;
 
-  /* 現在幹嘛：暖色陽光系 */
+  /* 现在干嘛：暖色阳光系 */
   --accent: #F26A1B;
   --accent-2: #F0386B;
   --accent-deep: #C9480C;
@@ -35,7 +35,7 @@
   --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
 }
 
-/* 真心話大冒險：派對紫 */
+/* 真心话大冒险：派对紫 */
 body[data-mode="party"] {
   --accent: #7C5CFF;
   --accent-2: #D94DFF;
@@ -123,7 +123,7 @@ body[data-mode="party"] .bg-party { opacity: 1; }
 .b1 { width: 80vmax; height: 80vmax; top: -38vmax; left: -32vmax; background: radial-gradient(circle closest-side, var(--b1) 30%, transparent); }
 .b2 { width: 72vmax; height: 72vmax; bottom: -34vmax; right: -32vmax; background: radial-gradient(circle closest-side, var(--b2) 30%, transparent); animation-duration: 22s; }
 .b3 { width: 50vmax; height: 50vmax; top: 30%; left: 48%; background: radial-gradient(circle closest-side, var(--b3) 25%, transparent); animation-duration: 26s; opacity: .45; }
-/* 看不到的那組背景、以及打開題庫時，先暫停背景動畫 */
+/* 看不到的那组背景、以及打开题库时，先暂停背景动画 */
 body:not([data-mode="party"]) .bg-party .blob,
 body[data-mode="party"] .bg-daily .blob,
 html:has(dialog[open]) .blob { animation-play-state: paused; }
@@ -203,7 +203,7 @@ main { flex: 1; }
 .pill-btn:hover { transform: translateY(-2px); }
 .pill-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line-strong); }
 
-/* ---------- 模式切換 ---------- */
+/* ---------- 模式切换 ---------- */
 .mode-switch {
   position: relative;
   display: grid;
@@ -265,7 +265,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 }
 .panel-head p { margin: 6px 0 0; color: var(--ink-soft); font-size: 15px; }
 
-/* ---------- 按鈕 ---------- */
+/* ---------- 按钮 ---------- */
 .actions {
   display: flex;
   flex-direction: column;
@@ -336,7 +336,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   font-size: 18px;
 }
 
-/* ---------- 現在幹嘛：任務卡 ---------- */
+/* ---------- 现在干嘛：任务卡 ---------- */
 .deck {
   position: relative;
   max-width: 400px;
@@ -466,7 +466,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   75% { transform: rotate(-6deg); }
 }
 
-/* ---------- 真心話大冒險：選擇器 ---------- */
+/* ---------- 真心话大冒险：选择器 ---------- */
 .picker { display: flex; flex-direction: column; gap: 10px; }
 .type-picker {
   display: grid;
@@ -541,7 +541,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 .level-picker button[data-level="normal"][aria-pressed="true"] { color: #12855F; }
 .level-picker button[data-level="advanced"][aria-pressed="true"] { color: #D62F45; }
 
-/* ---------- 真心話大冒險：翻牌 ---------- */
+/* ---------- 真心话大冒险：翻牌 ---------- */
 .flip-stage {
   display: flex;
   justify-content: center;
@@ -576,8 +576,8 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 }
 .flip-card.is-flipped .flip-inner { transform: rotateY(180deg); }
 
-/* 停下來時把背對我們的那一面完全藏起來，避免殘影透到另一面
-   （部分手機瀏覽器的 backface-visibility 對有動畫的子元素不可靠）；翻動中兩面都要在 */
+/* 停下来时把背对我们的那一面完全藏起来，避免残影透到另一面
+   （部分手机浏览器的 backface-visibility 对有动画的子元素不可靠）；翻动中两面都要在 */
 .face-content { visibility: hidden; }
 .flip-card.is-flipped .face-content { visibility: visible; }
 .flip-card.is-flipped .face-cover { visibility: hidden; }
@@ -708,7 +708,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   opacity: .85;
 }
 
-/* ---------- 自訂題庫（底部抽屜） ---------- */
+/* ---------- 自定义题库（底部抽屉） ---------- */
 .sheet {
   width: min(100%, 560px);
   max-width: 100%;
@@ -973,7 +973,7 @@ body[data-mode="party"] .sheet { background: #FAF8FF; }
 }
 .toast-action:hover { background: rgba(255, 255, 255, .1); }
 
-/* ---------- 彩帶 ---------- */
+/* ---------- 彩带 ---------- */
 .confetti-layer {
   position: fixed;
   inset: 0;
@@ -987,7 +987,7 @@ body[data-mode="party"] .sheet { background: #FAF8FF; }
   border-radius: 2px;
 }
 
-/* ---------- 小螢幕微調 ---------- */
+/* ---------- 小屏幕微调 ---------- */
 @media (max-width: 370px) {
   .mode-text small { display: none; }
   .mode-emoji { font-size: 20px; }
@@ -998,7 +998,7 @@ body[data-mode="party"] .sheet { background: #FAF8FF; }
   .panel-head p { display: none; }
 }
 
-/* ---------- 減少動態效果 ---------- */
+/* ---------- 减少动态效果 ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

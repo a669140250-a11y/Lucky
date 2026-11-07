@@ -1,5 +1,5 @@
 /* =========================================================
-   Lucky 抽一下 — 互動邏輯
+   Lucky 抽一下 — 交互逻辑
    ========================================================= */
 (function () {
   'use strict';
@@ -10,20 +10,20 @@
   var MAX_LEN = 140;
 
   var LABEL = {
-    truth: '💬 真心話',
-    dare: '🔥 大冒險',
+    truth: '💬 真心话',
+    dare: '🔥 大冒险',
     normal: '🌱 普通',
-    advanced: '🌶️ 進階',
-    daily: '☀️ 現在幹嘛'
+    advanced: '🌶️ 进阶',
+    daily: '☀️ 现在干嘛'
   };
-  var NAME = { truth: '真心話', dare: '大冒險', normal: '普通', advanced: '進階' };
+  var NAME = { truth: '真心话', dare: '大冒险', normal: '普通', advanced: '进阶' };
   var THEME_COLOR = { daily: '#F26A1B', party: '#7C5CFF' };
 
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* ---------------- 儲存 ---------------- */
+  /* ---------------- 保存 ---------------- */
   var storage = {
     get: function (key, fallback) {
       try {
@@ -94,7 +94,7 @@
     return cat === 'daily' ? DATA.daily : DATA[cat][level];
   }
 
-  /* ---------------- 隨機抽籤（洗牌袋：一輪抽完才會重複） ---------------- */
+  /* ---------------- 随机抽签（洗牌袋：一轮抽完才会重复） ---------------- */
   function randInt(n) {
     if (window.crypto && window.crypto.getRandomValues) {
       var buf = new Uint32Array(1);
@@ -112,7 +112,7 @@
     return arr;
   }
 
-  var poolVersion = 0;      // 題庫或設定變動時 +1，讓洗牌袋重新洗
+  var poolVersion = 0;      // 题库或设置变动时 +1，让洗牌袋重新洗
   var bags = {};
   var lastDrawn = {};
   var warned = {};
@@ -131,7 +131,7 @@
     });
     var custom = customList(cat, level).map(function (text) {
       return cat === 'daily'
-        ? { text: text, emoji: '✨', cat: '自訂', minutes: null, custom: true }
+        ? { text: text, emoji: '✨', cat: '自定义', minutes: null, custom: true }
         : { text: text, custom: true };
     });
 
@@ -146,7 +146,7 @@
     var bag = bags[key];
     if (!bag || bag.length === 0) {
       bag = shuffle(pool.slice());
-      // 避免新一輪的第一張剛好和上一張一樣
+      // 避免新一轮的第一张刚好和上一张一样
       var last = lastDrawn[key];
       if (last && bag.length > 1 && bag[bag.length - 1].text === last) {
         var tmp = bag[0]; bag[0] = bag[bag.length - 1]; bag[bag.length - 1] = tmp;
@@ -163,8 +163,8 @@
     var built = buildPool(cat, level);
     if (built.fallback && !warned[key]) {
       warned[key] = true;
-      var name = cat === 'daily' ? '「現在幹嘛」' : '「' + NAME[cat] + '・' + NAME[level] + '」';
-      toast(name + '還沒有自訂題目，先從內建題庫抽囉');
+      var name = cat === 'daily' ? '“现在干嘛”' : '“' + NAME[cat] + '·' + NAME[level] + '”';
+      toast(name + '还没有自定义题目，先从内置题库抽啦');
     }
     return drawFrom(key, built.pool);
   }
@@ -189,7 +189,7 @@
 
   function vibrate(pattern) {
     if (navigator.vibrate) {
-      try { navigator.vibrate(pattern); } catch (e) { /* 不支援就算了 */ }
+      try { navigator.vibrate(pattern); } catch (e) { /* 不支持就算了 */ }
     }
   }
 
@@ -207,7 +207,7 @@
   var toastAction = null;
 
   function toast(message, action) {
-    // 自訂題庫開著時，dialog 位於最上層，所以把 toast 搬進去才看得到
+    // 自定义题库开着时，dialog 位于最上层，所以把 toast 搬进去才看得到
     var sheet = $('#bankSheet');
     var host = sheet.open ? sheet : document.body;
     if (toastEl.parentNode !== host) host.appendChild(toastEl);
@@ -235,7 +235,7 @@
     if (action) action.run();
   });
 
-  /* ---------------- 彩帶 ---------------- */
+  /* ---------------- 彩带 ---------------- */
   function confetti(x, y) {
     if (reduceMotion.matches) return;
     var layer = $('#confetti');
@@ -270,7 +270,7 @@
     }
   }
 
-  /* ---------------- 模式切換 ---------------- */
+  /* ---------------- 模式切换 ---------------- */
   var tabs = $$('.mode-tab');
 
   function setMode(mode, focus) {
@@ -301,26 +301,26 @@
     });
   });
 
-  /* ---------------- 現在幹嘛 ---------------- */
+  /* ---------------- 现在干嘛 ---------------- */
   var taskCard = $('#taskCard');
   var taskEmoji = $('#taskEmoji');
   var drawDailyBtn = $('#drawDaily');
   var doneBtn = $('#doneDaily');
-  var dailyToken = 0;       // 每抽一次 +1；舊的動畫看到號碼不同就自動退場
+  var dailyToken = 0;       // 每抽一次 +1；旧的动画看到号码不同就自动退场
   var dailyHasCard = false;
 
   function categoryColor(cat) {
-    return DATA.categories[cat] || DATA.categories['自訂'];
+    return DATA.categories[cat] || DATA.categories['自定义'];
   }
 
   function renderTask(item) {
     taskCard.classList.remove('is-empty', 'is-done');
     taskCard.style.setProperty('--cat', categoryColor(item.cat));
     taskEmoji.textContent = item.emoji;
-    $('#taskCat').textContent = item.custom ? '✏️ 自訂' : '#' + item.cat;
+    $('#taskCat').textContent = item.custom ? '✏️ 自定义' : '#' + item.cat;
     var time = $('#taskTime');
     time.hidden = !item.minutes;
-    if (item.minutes) time.textContent = '⏱ ' + item.minutes + ' 分鐘';
+    if (item.minutes) time.textContent = '⏱ ' + item.minutes + ' 分钟';
     $('#taskText').textContent = item.text;
   }
 
@@ -329,7 +329,7 @@
     var item = drawItem('daily');
     vibrate(10);
 
-    // 從卡片「現在的樣子」開始退場，就算上一張還在飛也不會跳一下
+    // 从卡片“现在的样子”开始退场，就算上一张还在飞也不会跳一下
     var cs = getComputedStyle(taskCard);
     var from = { transform: cs.transform, opacity: cs.opacity };
     stopAnimations(taskCard);
@@ -348,11 +348,11 @@
       if (token !== dailyToken) return;
       renderTask(item);
       dailyHasCard = true;
-      $('.btn-label', drawDailyBtn).textContent = '再抽一張';
+      $('.btn-label', drawDailyBtn).textContent = '再抽一张';
       doneBtn.hidden = false;
       doneBtn.disabled = false;
       $('.btn-label', doneBtn).textContent = '完成了！';
-      announce('抽到任務：' + item.text);
+      announce('抽到任务：' + item.text);
 
       stopAnimations(taskEmoji);
       animate(taskEmoji, [
@@ -378,11 +378,11 @@
     renderDoneCount();
     taskCard.classList.add('is-done');
     doneBtn.disabled = true;
-    $('.btn-label', doneBtn).textContent = '已完成，抽下一個吧';
+    $('.btn-label', doneBtn).textContent = '已完成，抽下一个吧';
     vibrate([12, 40, 18]);
     var rect = doneBtn.getBoundingClientRect();
     confetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    var cheers = ['太棒了！🎉', '做得好！✨', '又完成一個！💪', '今天也很棒 🌈', '給自己拍拍手 👏'];
+    var cheers = ['太棒了！🎉', '做得好！✨', '又完成一个！💪', '今天也很棒 🌈', '给自己拍拍手 👏'];
     toast(cheers[randInt(cheers.length)]);
   }
 
@@ -393,24 +393,24 @@
   drawDailyBtn.addEventListener('click', drawDaily);
   doneBtn.addEventListener('click', completeTask);
 
-  /* ---------------- 真心話大冒險 ---------------- */
+  /* ---------------- 真心话大冒险 ---------------- */
   var flipCard = $('#flipCard');
   var flipInner = $('.flip-inner', flipCard);
   var faceCover = $('.face-cover', flipCard);
   var faceContent = $('#faceContent');
   var drawPartyBtn = $('#drawParty');
-  var flipped = false;      // 目前停在題目面
-  var spinning = false;     // 翻牌動畫進行中
-  var queuedDraw = false;   // 動畫中又按了一次 → 這次翻完馬上再抽
-  var shown = null;         // 題目面上那題的 { type, level }
+  var flipped = false;      // 目前停在题目面
+  var spinning = false;     // 翻牌动画进行中
+  var queuedDraw = false;   // 动画中又按了一次 → 这次翻完马上再抽
+  var shown = null;         // 题目面上那题的 { type, level }
   var partyCount = 0;
 
   var SPIN = {
-    // 背面 → 題目：最後帶一點點回彈
+    // 背面 → 题目：最后带一点点回弹
     reveal: { from: 0, to: 180, duration: 620, easing: 'cubic-bezier(.3, .9, .35, 1.06)' },
-    // 題目 → 轉一整圈 → 新題目：曲線必須前後對稱，轉到一半時剛好背面朝前，在那一刻換題
+    // 题目 → 转一整圈 → 新题目：曲线必须前后对称，转到一半时刚好背面朝前，在那一刻换题
     redraw: { from: 180, to: 540, duration: 760, easing: 'cubic-bezier(.65, 0, .35, 1)' },
-    // 題目 → 背面
+    // 题目 → 背面
     hide: { from: 180, to: 0, duration: 420, easing: 'cubic-bezier(.5, 0, .3, 1)' }
   };
 
@@ -419,7 +419,7 @@
     flipCard.classList.toggle('is-flipped', value);
     faceContent.setAttribute('aria-hidden', String(!value));
     faceCover.setAttribute('aria-hidden', String(value));
-    flipCard.setAttribute('aria-label', value ? '再抽一張' : '翻牌');
+    flipCard.setAttribute('aria-label', value ? '再抽一张' : '翻牌');
   }
 
   function renderPicker() {
@@ -431,7 +431,7 @@
     });
     flipCard.dataset.type = settings.type;
     $('#coverTitle').textContent = NAME[settings.type];
-    $('#coverSub').textContent = LABEL[settings.level] + ' · 點我翻牌';
+    $('#coverSub').textContent = LABEL[settings.level] + ' · 点我翻牌';
   }
 
   function spin(cfg, atMidpoint) {
@@ -498,7 +498,7 @@
     var count = ++partyCount;
     var fill = function () { showQuestion(item, type, level, count); };
     vibrate(12);
-    $('.btn-label', drawPartyBtn).textContent = '再抽一張';
+    $('.btn-label', drawPartyBtn).textContent = '再抽一张';
     announce(NAME[type] + '：' + item.text);
 
     var done;
@@ -523,7 +523,7 @@
       drawParty();
       return;
     }
-    // 翻牌途中換了類型或尺度 → 翻完後收回背面
+    // 翻牌途中换了类型或尺度 → 翻完后收回背面
     if (flipped && shown && (shown.type !== settings.type || shown.level !== settings.level)) hideCard();
   }
 
@@ -532,7 +532,7 @@
     settings[key] = value;
     saveSettings();
     renderPicker();
-    // 換類型或尺度時，把牌翻回背面，等待下一次翻牌
+    // 换类型或尺度时，把牌翻回背面，等待下一次翻牌
     if (flipped && !spinning) hideCard();
   }
 
@@ -551,7 +551,7 @@
     }
   });
 
-  /* ---------------- 自訂題庫 ---------------- */
+  /* ---------------- 自定义题库 ---------------- */
   var sheet = $('#bankSheet');
   var addInput = $('#addInput');
   var onlyCustomInput = $('#onlyCustom');
@@ -559,15 +559,15 @@
   var newestItems = [];
 
   var PLACEHOLDER = {
-    daily: '例如：去巷口買一杯沒喝過的飲料\n例如：寫一張小卡給明天的自己',
-    truth: '例如：你手機裡最近一張截圖是什麼？\n例如：你最想刪掉哪一則舊貼文？',
-    dare: '例如：用台語唱一段生日快樂歌\n例如：用三個 emoji 形容右邊的人'
+    daily: '例如：去楼下买一杯没喝过的饮料\n例如：写一张小卡给明天的自己',
+    truth: '例如：你手机里最近一张截屏是什么？\n例如：你最想删掉哪一条旧朋友圈？',
+    dare: '例如：用家乡话唱一段生日快乐歌\n例如：用三个 emoji 形容右边的人'
   };
 
   function saveBank() {
     invalidatePools();
     if (!storage.set(BANK_KEY, bank)) {
-      toast('⚠️ 無法儲存，瀏覽器可能封鎖了本機儲存空間');
+      toast('⚠️ 无法保存，浏览器可能禁用了本地存储');
     }
   }
 
@@ -604,7 +604,7 @@
       del.type = 'button';
       del.className = 'del-btn';
       del.textContent = '🗑️';
-      del.setAttribute('aria-label', '刪除：' + text);
+      del.setAttribute('aria-label', '删除：' + text);
       del.addEventListener('click', function () { removeItem(index); });
 
       li.appendChild(num);
@@ -618,7 +618,7 @@
     $('#bankCount').textContent = list.length;
     $('#bankEmpty').hidden = list.length > 0;
     $('#clearCat').disabled = list.length === 0;
-    $('#builtinCount').textContent = '另有內建 ' + builtinList(cat, level).length + ' 題';
+    $('#builtinCount').textContent = '另有内置 ' + builtinList(cat, level).length + ' 题';
     onlyCustomInput.checked = settings.onlyCustom;
   }
 
@@ -628,12 +628,12 @@
     saveBank();
     renderBank();
     toast(message, {
-      label: '復原',
+      label: '撤销',
       run: function () {
         bank = normalizeBank(JSON.parse(snapshot));
         saveBank();
         renderBank();
-        toast('已復原 ↩️');
+        toast('已撤销 ↩️');
       }
     });
   }
@@ -644,7 +644,7 @@
       .map(function (s) { return s.trim(); })
       .filter(Boolean);
     if (!lines.length) {
-      toast('先輸入題目再新增喔 ✍️');
+      toast('先输入题目再添加哦 ✍️');
       addInput.focus();
       return;
     }
@@ -661,14 +661,14 @@
     });
 
     if (!added.length) {
-      toast('這些題目已經在題庫裡了 👀');
+      toast('这些题目已经在题库里了 👀');
       return;
     }
 
     newestItems = added.slice();
-    var msg = '已新增 ' + added.length + ' 題 🎉';
-    if (skipped) msg += '（略過 ' + skipped + ' 題重複）';
-    if (trimmed) msg += '（過長題目已截至 ' + MAX_LEN + ' 字）';
+    var msg = '已添加 ' + added.length + ' 题 🎉';
+    if (skipped) msg += '（跳过 ' + skipped + ' 题重复）';
+    if (trimmed) msg += '（过长的题目已截断为 ' + MAX_LEN + ' 字）';
     changeBank(function () {
       Array.prototype.push.apply(list, added);
     }, msg);
@@ -680,14 +680,14 @@
     var list = customList(bankView.cat, bankView.level);
     var text = list[index];
     if (text === undefined) return;
-    changeBank(function () { list.splice(index, 1); }, '已刪除「' + truncate(text, 12) + '」');
+    changeBank(function () { list.splice(index, 1); }, '已删除“' + truncate(text, 12) + '”');
   }
 
   function clearCategory() {
     var list = customList(bankView.cat, bankView.level);
     if (!list.length) return;
     var count = list.length;
-    changeBank(function () { list.length = 0; }, '已清空 ' + count + ' 題');
+    changeBank(function () { list.length = 0; }, '已清空 ' + count + ' 题');
   }
 
   function truncate(text, n) {
@@ -695,7 +695,7 @@
   }
 
   function openBank() {
-    // 預設打開目前正在玩的分類
+    // 缺省打开目前正在玩的分类
     if (settings.mode === 'daily') {
       bankView.cat = 'daily';
     } else {
@@ -734,7 +734,7 @@
       total += bank[t].normal.length + bank[t].advanced.length;
     });
     if (!total) {
-      toast('題庫還是空的，先新增幾題再匯出吧');
+      toast('题库还是空的，先添加几题再导出吧');
       return;
     }
     var payload = {
@@ -754,7 +754,7 @@
     a.click();
     a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    toast('已匯出 ' + total + ' 題 💾');
+    toast('已导出 ' + total + ' 题 💾');
   }
 
   function importBank(file) {
@@ -764,7 +764,7 @@
       try {
         parsed = JSON.parse(String(reader.result));
       } catch (err) {
-        toast('😵 檔案格式不對，請選擇 Lucky 匯出的 JSON 檔');
+        toast('😵 文件格式不对，请选择 Lucky 导出的 JSON 文件');
         return;
       }
       var incoming = normalizeBank(parsed && parsed.bank ? parsed.bank : parsed);
@@ -778,21 +778,21 @@
         });
       }, function (snapshot) {
         if (!added) {
-          toast('沒有新的題目可以匯入 👀');
+          toast('没有新的题目可以导入 👀');
           return;
         }
-        toast('已匯入 ' + added + ' 題 📥', {
-          label: '復原',
+        toast('已导入 ' + added + ' 题 📥', {
+          label: '撤销',
           run: function () {
             bank = normalizeBank(JSON.parse(snapshot));
             saveBank();
             renderBank();
-            toast('已復原 ↩️');
+            toast('已撤销 ↩️');
           }
         });
       });
     };
-    reader.onerror = function () { toast('😵 讀取檔案失敗'); };
+    reader.onerror = function () { toast('😵 读取文件失败'); };
     reader.readAsText(file);
   }
 
@@ -823,7 +823,7 @@
     closeBank();
   });
   sheet.addEventListener('click', function (e) {
-    // 點背景（dialog 本身）就關閉
+    // 点背景（dialog 本身）就关闭
     if (e.target === sheet) closeBank();
   });
   $$('#bankCatSeg button').forEach(function (btn) {
@@ -840,14 +840,14 @@
   });
   $('#addForm').addEventListener('submit', addItems);
   addInput.addEventListener('keydown', function (e) {
-    // Ctrl / ⌘ + Enter 快速新增
+    // Ctrl / ⌘ + Enter 快速添加
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addItems(e);
   });
   onlyCustomInput.addEventListener('change', function () {
     settings.onlyCustom = onlyCustomInput.checked;
     saveSettings();
     invalidatePools();
-    toast(settings.onlyCustom ? '之後只會抽你的自訂題目 ✏️' : '內建＋自訂題目一起抽 🎲');
+    toast(settings.onlyCustom ? '之后只会抽你的自定义题目 ✏️' : '内置＋自定义题目一起抽 🎲');
   });
   $('#exportBank').addEventListener('click', exportBank);
   $('#importBank').addEventListener('click', function () { $('#importFile').click(); });

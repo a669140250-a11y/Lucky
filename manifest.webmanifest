@@ -1,8 +1,8 @@
 {
   "name": "Lucky 抽一下",
   "short_name": "Lucky",
-  "description": "現在幹嘛？真心話還是大冒險？交給 Lucky 幫你抽一張！",
-  "lang": "zh-Hant-TW",
+  "description": "现在干嘛？真心话还是大冒险？交给 Lucky 帮你抽一张！",
+  "lang": "zh-Hans",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
