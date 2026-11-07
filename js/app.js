@@ -17,7 +17,6 @@
     daily: '☀️ 现在干嘛'
   };
   var NAME = { truth: '真心话', dare: '大冒险', normal: '普通', advanced: '进阶' };
-  var THEME_COLOR = { daily: '#F26A1B', party: '#7C5CFF' };
 
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
@@ -239,8 +238,8 @@
   function confetti(x, y) {
     if (reduceMotion.matches) return;
     var layer = $('#confetti');
-    var colors = ['#F26A1B', '#F0386B', '#FFC23C', '#7C5CFF', '#16A88A', '#4F7CFF'];
-    for (var i = 0; i < 40; i++) {
+    var colors = ['#D96B3F', '#6A5FD0', '#4A77C8', '#CF566B', '#2E9A80', '#E0B04A'];
+    for (var i = 0; i < 26; i++) {
       var p = document.createElement('i');
       var size = 6 + Math.random() * 7;
       p.className = 'confetti-piece';
@@ -285,8 +284,6 @@
     });
     $('#panel-daily').hidden = mode !== 'daily';
     $('#panel-party').hidden = mode !== 'party';
-    var meta = $('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', THEME_COLOR[mode]);
   }
 
   tabs.forEach(function (tab) {

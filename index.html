@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F26A1B">
-  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#F4F3F0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16151A" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <meta name="description" content="现在干嘛？真心话还是大冒险？交给 Lucky 帮你抽一张！">
   <title>Lucky 抽一下</title>
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -17,8 +18,8 @@
 </head>
 <body data-mode="daily">
   <div class="bg" aria-hidden="true">
-    <div class="bg-layer bg-daily"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
-    <div class="bg-layer bg-party"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+    <div class="bg-layer bg-daily"></div>
+    <div class="bg-layer bg-party"></div>
   </div>
 
   <div class="app">
