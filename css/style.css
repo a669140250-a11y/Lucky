@@ -565,6 +565,15 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 .flip-card.is-flipped .flip-inner { transform: rotateY(180deg); }
 .flip-card.is-quick .flip-inner { transition-duration: .45s; transition-timing-function: ease-in; }
 
+/* 翻完後把背對我們的那一面完全藏起來，避免殘影透到另一面
+   （部分手機瀏覽器的 backface-visibility 對有動畫的子元素不可靠） */
+.face-cover { transition: visibility 0s; }
+.flip-card.is-flipped .face-cover { visibility: hidden; transition-delay: .8s; }
+.flip-card.is-flipped .cover-ring { animation: none; }
+.face-content { visibility: hidden; transition: visibility 0s .8s; }
+.flip-card.is-quick .face-content { transition-delay: .45s; }
+.flip-card.is-flipped .face-content { visibility: visible; transition-delay: 0s; }
+
 .face {
   position: absolute;
   inset: 0;
@@ -640,17 +649,6 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   inset: 0 0 auto;
   height: 10px;
   background: linear-gradient(90deg, var(--c1), var(--c2));
-}
-.face-content::after {
-  content: "“";
-  position: absolute;
-  left: 14px;
-  top: 30px;
-  font-family: Georgia, serif;
-  font-size: 150px;
-  line-height: 1;
-  color: color-mix(in srgb, var(--c1) 12%, white);
-  pointer-events: none;
 }
 .face-content > * { position: relative; z-index: 1; }
 .content-badges {
@@ -1000,5 +998,6 @@ body[data-mode="party"] .sheet { background: #FAF8FF; }
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+    transition-delay: 0s !important;
   }
 }
