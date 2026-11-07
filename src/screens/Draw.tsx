@@ -90,7 +90,10 @@ export function Draw(props: Props) {
     }, 880);
   };
 
-  const onDropDone = () => go('confirm');
+  // 只有真的抽出签时才进入确认步骤
+  const onDropDone = () => {
+    if (dropping.current) go('confirm');
+  };
 
   // 摇动侦测：只在摇签步骤、且画面在前景时监听
   useEffect(() => {
@@ -165,6 +168,7 @@ export function Draw(props: Props) {
     setProgress(0);
     energy.current = 0;
     dropping.current = false;
+    setDropKey(0);
     setAttempt((a) => a + 1);
     go('shake');
   };
@@ -203,6 +207,7 @@ export function Draw(props: Props) {
     setProgress(0);
     energy.current = 0;
     dropping.current = false;
+    setDropKey(0);
     setAttempt((a) => a + 1);
     go('category');
   };

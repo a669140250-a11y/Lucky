@@ -3,15 +3,17 @@ import { useEffect, useRef } from 'preact/hooks';
 const STICKS = [-26, -18, -10, -3, 4, 11, 18, 25];
 
 /**
- * 签筒。shaking 时左右晃动；dropKey 改变时让一支竹签从筒口跳出、掉落地面。
- * returning 为 true 时播放把签放回筒中的动画。
+ * 签筒。shaking 时左右晃动；dropKey 在挂载之后改变时，让一支竹签从筒口跳出、掉落地面。
+ * 挂载当下的 dropKey 只当作起始值，不会播放掉签（避免重新挂载时自己掉签）。
  */
-export function QianTong(props: { shaking: boolean; dropKey: number; returning?: boolean; onDropDone?: () => void }) {
+export function QianTong(props: { shaking: boolean; dropKey: number; onDropDone?: () => void }) {
   const stick = useRef<HTMLDivElement>(null);
+  const lastKey = useRef(props.dropKey);
   const reduce = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   useEffect(() => {
-    if (!props.dropKey || !stick.current) return;
+    if (props.dropKey === lastKey.current || !stick.current) return;
+    lastKey.current = props.dropKey;
     const el = stick.current;
     const side = Math.random() < 0.5 ? -1 : 1;
     const a = el.animate(
@@ -28,11 +30,6 @@ export function QianTong(props: { shaking: boolean; dropKey: number; returning?:
     a.finished.then(() => props.onDropDone?.()).catch(() => undefined);
     return () => a.cancel();
   }, [props.dropKey]);
-
-  useEffect(() => {
-    if (!props.returning || !stick.current) return;
-    stick.current.getAnimations().forEach((a) => a.cancel());
-  }, [props.returning]);
 
   return (
     <div class="qiantong-wrap" aria-hidden="true">
