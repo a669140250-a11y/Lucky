@@ -63,13 +63,20 @@ node scripts/gen-poems-hans.mjs            # 由繁体定稿转出简体版 qian
 - `node scripts/gen-poems-hans.mjs`：以 OpenCC 把繁体核对定稿的签诗转成简体（核对时以三个台湾来源的繁体原文逐字比对，因此定稿保留繁体）。
 - `node scripts/gen-icons.mjs`：由 `scripts/icon.svg` 产生 PWA 图示（需 Playwright）。
 
-## 部署（之后要上线时）
+## 部署（GitHub Pages）
 
-摇动侦测（DeviceMotion）**必须在 HTTPS 下**才能使用，所以请放在 HTTPS 网址：
+`.github/workflows/deploy.yml` 会在合并到 `main` 时自动测试、建置并部署，网址为：
 
-- `npm run build` 后把 `dist/` 整个资料夹上传到任何静态网站主机即可（GitHub Pages、Cloudflare Pages、Netlify 等）。
-- `vite.config.ts` 已设置 `base: './'`，放在网域根目录或子路径（例如 `https://账号.github.io/Lucky/`）都能运作。
-- 若用 GitHub Pages：免费方案需要把 repo 设为公开；到 Settings → Pages 选择来源即可。
+**https://a669140250-a11y.github.io/Lucky/**
+
+第一次部署前要在 GitHub 上设置两件事：
+
+1. **仓库改为公开**（免费方案的 GitHub Pages 只支持公开仓库；GitHub Pro 可跳过）：Settings → General → 最下方 Danger Zone → Change visibility → Public。
+2. **启用 Pages**：Settings → Pages → Build and deployment → Source 选 **GitHub Actions**。
+
+之后合并到 `main` 就会自动部署；也可以在 Actions 页选“部署到 GitHub Pages” → Run workflow 手动执行。
+
+摇动侦测（DeviceMotion）必须在 HTTPS 下使用，GitHub Pages 本身就是 HTTPS。`vite.config.ts` 设置了 `base: './'`，放在子路径 `/Lucky/` 也能正常运作；`dist/` 也可以上传到任何其他静态网站主机。
 
 ## 加到手机主屏幕
 
