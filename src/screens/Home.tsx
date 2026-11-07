@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { Footer, Icon, Modal, ScreenHeader } from '../components/ui';
-import { canShareFiles, downloadBlob, renderFortuneCard, shareImage } from '../lib/card';
+import { canShareFiles, renderFortuneCard, shareImage } from '../lib/card';
+import { IS_PREVIEW, saveFile } from '../lib/platform';
 import type { DailyFortune } from '../lib/fortune';
 import { type Bazi, type DayInfo, ganElement } from '../lib/lunar';
 import type { Profile } from '../lib/storage';
@@ -46,7 +47,12 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
   const share = async () => {
     if (!card) return;
     const r = await shareImage(card.blob, filename);
-    setMsg(r === 'downloaded' ? '已下載圖片' : r === 'shared' ? '' : '');
+    setMsg(r === 'downloaded' ? '已下載圖片' : '');
+  };
+  const save = async () => {
+    if (!card) return;
+    const r = await saveFile(card.blob, filename);
+    setMsg(r === 'saved' ? '已儲存圖片' : r === 'declined' ? '' : '這裡無法直接存檔，請長按上方圖片儲存。');
   };
 
   const day2 = day.solarText.match(/(\d+)年(\d+)月(\d+)日/)!;
@@ -150,7 +156,7 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
                   <Icon name="share" /> 分享
                 </button>
               )}
-              <button class="btn ghost" onClick={() => { downloadBlob(card.blob, filename); setMsg('已下載圖片'); }}>
+              <button class={`btn ${IS_PREVIEW ? 'primary' : 'ghost'}`} onClick={save}>
                 <Icon name="download" /> 存圖
               </button>
             </div>

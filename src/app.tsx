@@ -31,11 +31,17 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'settings', label: '設定', icon: 'settings' },
 ];
 
+// 啟動時外層（例如預覽連結的檢視器）可能已設定 data-theme，「跟隨系統」時還原它
+const hostTheme = document.documentElement.dataset.theme;
+
 function applyTheme(pref: S['theme']) {
   const root = document.documentElement;
-  if (pref === 'system') delete root.dataset.theme;
-  else root.dataset.theme = pref;
-  const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  if (pref === 'system') {
+    if (hostTheme) root.dataset.theme = hostTheme;
+    else delete root.dataset.theme;
+  } else root.dataset.theme = pref;
+  const effective = pref === 'system' ? hostTheme : pref;
+  const dark = effective ? effective === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#1b1310' : '#9e2a20');
 }
 

@@ -68,10 +68,17 @@ export interface CardInput {
 
 export async function renderFortuneCard(input: CardInput): Promise<Blob> {
   const { nickname, day, fortune: f } = input;
+  // 網路字型依字元分段載入：先把圖卡會用到的字載好，否則 Canvas 會用後備字型
   try {
-    await document.fonts?.ready;
+    const text = [day.solarText, day.weekday, day.lunarText, day.dayGz, day.jieqi, f.god, f.theme, f.line,
+      f.color, f.element, ...day.yi, ...day.ji, f.chong?.title ?? '', '今日一籤農曆年月日宜忌幸運五行色數字凡事宜緩・'].join('');
+    await Promise.all([
+      document.fonts.load(`700 48px "Noto Serif TC"`, text),
+      document.fonts.load(`400 34px "Noto Serif TC"`, text),
+    ]);
+    await document.fonts.ready;
   } catch {
-    /* 忽略 */
+    /* 字型載入失敗時用後備字型 */
   }
   const canvas = document.createElement('canvas');
   canvas.width = W;
@@ -232,6 +239,7 @@ export async function renderFortuneCard(input: CardInput): Promise<Blob> {
 export type ShareOutcome = 'shared' | 'downloaded' | 'cancelled';
 
 export function canShareFiles(): boolean {
+  if (import.meta.env.MODE === 'artifact') return false;
   try {
     const f = new File([new Blob()], 'x.png', { type: 'image/png' });
     return typeof navigator.canShare === 'function' && navigator.canShare({ files: [f] });

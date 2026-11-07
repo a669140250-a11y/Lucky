@@ -19,6 +19,7 @@ interface Props {
 
 export function Journal({ journal, onUpdate, onDelete, onDraw }: Props) {
   const [open, setOpen] = useState<string | null>(null);
+  const [askDelete, setAskDelete] = useState<string | null>(null);
   const list = [...journal].sort((a, b) => b.ts - a.ts);
   const yes = journal.filter((j) => j.outcome === 'yes').length;
   const no = journal.filter((j) => j.outcome === 'no').length;
@@ -77,14 +78,19 @@ export function Journal({ journal, onUpdate, onDelete, onDraw }: Props) {
             </div>
             <NoteField value={e.note} onSave={(note) => onUpdate(e.id, { note })} />
             <div class="entry-foot">
-              <button
-                class="link danger"
-                onClick={() => {
-                  if (confirm('確定要刪除這筆籤本紀錄嗎？')) onDelete(e.id);
-                }}
-              >
-                <Icon name="trash" size={16} /> 刪除
-              </button>
+              {askDelete === e.id ? (
+                <div class="confirm-inline" role="group" aria-label="確認刪除">
+                  <span>刪除這筆紀錄？</span>
+                  <button class="link" onClick={() => setAskDelete(null)}>取消</button>
+                  <button class="link danger strong" onClick={() => { onDelete(e.id); setAskDelete(null); }}>
+                    確定刪除
+                  </button>
+                </div>
+              ) : (
+                <button class="link danger" onClick={() => setAskDelete(e.id)}>
+                  <Icon name="trash" size={16} /> 刪除
+                </button>
+              )}
             </div>
           </article>
         );

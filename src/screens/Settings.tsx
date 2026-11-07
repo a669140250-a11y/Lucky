@@ -1,8 +1,8 @@
 import { useRef, useState } from 'preact/hooks';
 import { ProfileForm } from '../components/ProfileForm';
 import { Footer, ScreenHeader } from '../components/ui';
-import { downloadBlob } from '../lib/card';
 import { canVibrate } from '../lib/haptics';
+import { saveFile } from '../lib/platform';
 import { SOURCES } from '../lib/qian';
 import { type Backup, type Profile, type Settings as S, type ThemePref, makeBackup, parseBackup } from '../lib/storage';
 
@@ -19,25 +19,24 @@ export function Settings(props: Props) {
   const { settings: s } = props;
   const [savedMsg, setSavedMsg] = useState('');
   const [dataMsg, setDataMsg] = useState('');
+  const [pending, setPending] = useState<Backup | null>(null); // 等待確認的匯入
+  const [askClear, setAskClear] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<S>) => props.onSettings({ ...s, ...patch });
 
-  const exportData = () => {
+  const exportData = async () => {
     const blob = new Blob([JSON.stringify(makeBackup(), null, 1)], { type: 'application/json' });
     const d = new Date();
-    downloadBlob(blob, `今日一籤備份-${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}.json`);
-    setDataMsg('已匯出備份檔。');
+    const r = await saveFile(blob, `今日一籤備份-${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}.json`);
+    setDataMsg(r === 'saved' ? '已匯出備份檔。' : r === 'declined' ? '' : '這裡無法存檔，請改用正式版匯出。');
   };
 
   const importData = async (e: Event) => {
     const f = (e.target as HTMLInputElement).files?.[0];
     if (!f) return;
     try {
-      const b = parseBackup(await f.text());
-      if (confirm(`將以備份檔取代目前資料（籤本 ${b.journal.length} 筆），確定嗎？`)) {
-        props.onImport(b);
-        setDataMsg('已匯入備份。');
-      }
+      setPending(parseBackup(await f.text()));
+      setDataMsg('');
     } catch (err) {
       setDataMsg(`匯入失敗：${(err as Error).message}`);
     } finally {
@@ -110,14 +109,37 @@ export function Settings(props: Props) {
           <button class="btn ghost" onClick={() => fileRef.current?.click()}>匯入備份</button>
           <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={importData} />
         </div>
-        <button
-          class="link danger"
-          onClick={() => {
-            if (confirm('確定要清除所有資料（個人資料、設定、籤本）嗎？此動作無法復原。')) props.onClear();
-          }}
-        >
-          清除所有資料
-        </button>
+        {pending && (
+          <div class="confirm-box" role="group" aria-label="確認匯入">
+            <p>以備份檔取代目前資料？備份內有籤本 {pending.journal.length} 筆，目前的資料會被覆蓋。</p>
+            <div class="row">
+              <button class="btn ghost" onClick={() => setPending(null)}>取消</button>
+              <button
+                class="btn primary"
+                onClick={() => {
+                  props.onImport(pending);
+                  setPending(null);
+                  setDataMsg('已匯入備份。');
+                }}
+              >
+                確定匯入
+              </button>
+            </div>
+          </div>
+        )}
+        {askClear ? (
+          <div class="confirm-box danger" role="group" aria-label="確認清除">
+            <p>清除個人資料、設定與全部籤本？此動作無法復原。</p>
+            <div class="row">
+              <button class="btn ghost" onClick={() => setAskClear(false)}>取消</button>
+              <button class="btn primary" onClick={() => props.onClear()}>確定清除</button>
+            </div>
+          </div>
+        ) : (
+          <button class="link danger" onClick={() => setAskClear(true)}>
+            清除所有資料
+          </button>
+        )}
         {dataMsg && <p class="hint" role="status">{dataMsg}</p>}
       </div>
 

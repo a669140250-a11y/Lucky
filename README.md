@@ -23,6 +23,7 @@ npm run dev        # 開發伺服器
 npm test           # 單元測試（曆法、十神、幸運五行、筊杯機率、籤詩資料完整性）
 npm run build      # 產生 dist/（靜態檔，可放到任何 HTTPS 主機）
 npm run preview    # 預覽 build 結果
+npm run build:artifact -- 輸出.html   # 產生單一 HTML 預覽版（JS／CSS 內嵌，無 Service Worker、無搖動偵測）
 ```
 
 技術：Vite + Preact + TypeScript、`vite-plugin-pwa`、[`lunar-javascript`](https://github.com/6tail/lunar-javascript)（干支、農曆、宜忌、沖煞、八字一律由它計算）。

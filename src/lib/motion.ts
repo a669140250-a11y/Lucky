@@ -1,9 +1,12 @@
+import { IS_PREVIEW } from './platform';
+
 // 搖動偵測。iOS 13+ 必須在點擊事件中呼叫 DeviceMotionEvent.requestPermission()。
 type PermissionFn = () => Promise<'granted' | 'denied'>;
 
 export type MotionSupport = 'needs-permission' | 'available' | 'unsupported';
 
 export function motionSupport(): MotionSupport {
+  if (IS_PREVIEW) return 'unsupported'; // 預覽連結的框架不提供動作感測器
   if (typeof window === 'undefined' || typeof DeviceMotionEvent === 'undefined') return 'unsupported';
   if (!window.isSecureContext) return 'unsupported'; // 搖動偵測需要 HTTPS
   const req = (DeviceMotionEvent as unknown as { requestPermission?: PermissionFn }).requestPermission;
