@@ -2,11 +2,11 @@ import type { Birth } from './lunar';
 
 export type CategoryId = 'career' | 'love' | 'wealth' | 'health' | 'study' | 'other';
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
-  { id: 'career', label: '事業' },
+  { id: 'career', label: '事业' },
   { id: 'love', label: '感情' },
-  { id: 'wealth', label: '財運' },
+  { id: 'wealth', label: '财运' },
   { id: 'health', label: '健康' },
-  { id: 'study', label: '學業' },
+  { id: 'study', label: '学业' },
   { id: 'other', label: '其他' },
 ];
 export const categoryLabel = (id: CategoryId) => CATEGORIES.find((c) => c.id === id)?.label ?? '其他';
@@ -18,7 +18,7 @@ export interface Profile {
 
 export type ThemePref = 'system' | 'light' | 'dark';
 export interface Settings {
-  confirmMode: 1 | 3; // 擲筊確認：一個聖筊或連續三個聖筊
+  confirmMode: 1 | 3; // 掷筊确认：一个圣筊或连续三个圣筊
   theme: ThemePref;
   sound: boolean;
   vibrate: boolean;
@@ -98,10 +98,10 @@ export function makeBackup(): Backup {
   };
 }
 
-/** 驗證並回傳備份內容；格式不符時丟出錯誤。 */
+/** 验证并回传备份内容；格式不符时丢出错误。 */
 export function parseBackup(text: string): Backup {
   const b = JSON.parse(text) as Backup;
-  if (b?.app !== 'jinri-yiqian' || !Array.isArray(b.journal)) throw new Error('不是今日一籤的備份檔');
+  if (b?.app !== 'jinri-yiqian' || !Array.isArray(b.journal)) throw new Error('不是今日一签的备份文件');
   return b;
 }
 

@@ -39,27 +39,27 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
         return { blob, url: URL.createObjectURL(blob) };
       });
     } catch (e) {
-      setCardErr((e as Error).message || '圖卡產生失敗');
+      setCardErr((e as Error).message || '卡片产生失败');
     }
   };
 
-  const filename = `今日一籤-${day.key}.png`;
+  const filename = `今日一签-${day.key}.png`;
   const share = async () => {
     if (!card) return;
     const r = await shareImage(card.blob, filename);
-    setMsg(r === 'downloaded' ? '已下載圖片' : '');
+    setMsg(r === 'downloaded' ? '已下载图片' : '');
   };
   const save = async () => {
     if (!card) return;
     const r = await saveFile(card.blob, filename);
-    setMsg(r === 'saved' ? '已儲存圖片' : r === 'declined' ? '' : '這裡無法直接存檔，請長按上方圖片儲存。');
+    setMsg(r === 'saved' ? '已保保存图片片' : r === 'declined' ? '' : '这里无法直接保存，请长按上方图片。');
   };
 
   const day2 = day.solarText.match(/(\d+)年(\d+)月(\d+)日/)!;
 
   return (
     <section class="screen-body">
-      <ScreenHeader title="今日運勢" sub={`${profile.nickname}，${greeting()}`} />
+      <ScreenHeader title="今日运势" sub={`${profile.nickname}，${greeting()}`} />
 
       <div class="card date-card">
         <div class="date-big">
@@ -68,7 +68,7 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
           <span class="y">{day2[1]}</span>
         </div>
         <div class="date-lunar">
-          <div class="lunar-main">農曆{day.lunarText}</div>
+          <div class="lunar-main">农历{day.lunarText}</div>
           <div>{day.lunarYearGz}年（{day.lunarYearSx}）</div>
           <div class="gz">
             <b>{day.dayGz}日</b>
@@ -86,7 +86,7 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
           <span class="yiji-badge ji">忌</span>
           <div class="chips">{day.ji.map((w) => <span class="chip" key={w}>{w}</span>)}</div>
         </div>
-        <p class="yiji-foot">沖{day.chongDesc}・煞{day.sha}</p>
+        <p class="yiji-foot">冲{day.chongDesc}・煞{day.sha}</p>
       </div>
 
       {f.chong && (
@@ -106,28 +106,28 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
             <span>{f.god[1]}</span>
           </div>
           <div>
-            <p class="kicker">今日主題</p>
+            <p class="kicker">今日主题</p>
             <h2 class="theme">{f.theme}</h2>
             <p class="relation">
-              今日日干{day.dayGan}{ganElement(day.dayGan)}，對你的日主{bazi.dayMaster}{bazi.element}為「{f.god}」。
+              今日日干{day.dayGan}{ganElement(day.dayGan)}，对你的日主{bazi.dayMaster}{bazi.element}为“{f.god}”。
             </p>
           </div>
         </div>
         <p class="fortune-line">{f.line}</p>
         <div class="lucky">
           <div class="lucky-item">
-            <span class="k">幸運五行</span>
+            <span class="k">幸运五行</span>
             <b class={`el el-${f.element}`}>{f.element}</b>
           </div>
           <div class="lucky-item">
-            <span class="k">幸運色</span>
+            <span class="k">幸运色</span>
             <b>
               <i class="swatch" style={{ background: f.colorHex }} />
               {f.color}色
             </b>
           </div>
           <div class="lucky-item">
-            <span class="k">幸運數字</span>
+            <span class="k">幸运数字</span>
             <b>{f.numbers.join('・')}</b>
           </div>
         </div>
@@ -135,21 +135,21 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
       </div>
 
       <div class="actions">
-        <button class="btn primary big" onClick={onDraw}>擲筊求籤</button>
+        <button class="btn primary big" onClick={onDraw}>掷筊求签</button>
         <button class="btn ghost big" onClick={makeCard}>
-          <Icon name="image" /> 生成今日運勢圖卡
+          <Icon name="image" /> 生成今日运势卡片
         </button>
       </div>
 
       <Footer />
 
-      <Modal open={cardOpen} onClose={() => setCardOpen(false)} title="今日運勢圖卡">
+      <Modal open={cardOpen} onClose={() => setCardOpen(false)} title="今日运势卡片">
         {cardErr && <p class="err">{cardErr}</p>}
-        {!card && !cardErr && <p class="hint center">圖卡繪製中…</p>}
+        {!card && !cardErr && <p class="hint center">卡片绘制中…</p>}
         {card && (
           <>
-            <img class="card-preview" src={card.url} alt="今日運勢圖卡" />
-            <p class="hint center small">手機上也可以長按圖片直接儲存。</p>
+            <img class="card-preview" src={card.url} alt="今日运势卡片" />
+            <p class="hint center small">手机上也可以长按图片直接保存。</p>
             <div class="row">
               {canShareFiles() && (
                 <button class="btn primary" onClick={share}>
@@ -157,7 +157,7 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
                 </button>
               )}
               <button class={`btn ${IS_PREVIEW ? 'primary' : 'ghost'}`} onClick={save}>
-                <Icon name="download" /> 存圖
+                <Icon name="download" /> 保存图片
               </button>
             </div>
             {msg && <p class="hint center">{msg}</p>}
@@ -170,9 +170,9 @@ export function Home({ profile, bazi, day, fortune: f, onDraw }: Props) {
 
 function greeting(): string {
   const h = new Date().getHours();
-  if (h < 5) return '夜深了，早點休息';
+  if (h < 5) return '夜深了，早点休息';
   if (h < 11) return '早安';
   if (h < 14) return '午安';
-  if (h < 18) return '午後好';
-  return '晚安';
+  if (h < 18) return '下午好';
+  return '晚上好';
 }

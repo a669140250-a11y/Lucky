@@ -1,19 +1,19 @@
 import { IS_PREVIEW } from './platform';
 
-// 搖動偵測。iOS 13+ 必須在點擊事件中呼叫 DeviceMotionEvent.requestPermission()。
+// 摇动侦测。iOS 13+ 必须在点击事件中呼叫 DeviceMotionEvent.requestPermission()。
 type PermissionFn = () => Promise<'granted' | 'denied'>;
 
 export type MotionSupport = 'needs-permission' | 'available' | 'unsupported';
 
 export function motionSupport(): MotionSupport {
-  if (IS_PREVIEW) return 'unsupported'; // 預覽連結的框架不提供動作感測器
+  if (IS_PREVIEW) return 'unsupported'; // 预览连结的框架不提供动作感测器
   if (typeof window === 'undefined' || typeof DeviceMotionEvent === 'undefined') return 'unsupported';
-  if (!window.isSecureContext) return 'unsupported'; // 搖動偵測需要 HTTPS
+  if (!window.isSecureContext) return 'unsupported'; // 摇动侦测需要 HTTPS
   const req = (DeviceMotionEvent as unknown as { requestPermission?: PermissionFn }).requestPermission;
   return typeof req === 'function' ? 'needs-permission' : 'available';
 }
 
-/** 需在使用者點擊的處理函式中直接呼叫。 */
+/** 需在使用者点击的处理函式中直接呼叫。 */
 export async function requestMotionPermission(): Promise<boolean> {
   const req = (DeviceMotionEvent as unknown as { requestPermission?: PermissionFn }).requestPermission;
   if (typeof req !== 'function') return true;
@@ -25,8 +25,8 @@ export async function requestMotionPermission(): Promise<boolean> {
 }
 
 /**
- * 監聽搖動。onActive 在第一次收到有效感測資料時呼叫（用來確認裝置真的有加速度計）；
- * onShake 在每次偵測到明顯晃動時呼叫，參數為 0–1 的強度。
+ * 监听摇动。onActive 在第一次收到有效感测资料时呼叫（用来确认装置真的有加速度计）；
+ * onShake 在每次侦测到明显晃动时呼叫，参数为 0–1 的强度。
  */
 export function listenShake(onShake: (intensity: number) => void, onActive?: () => void): () => void {
   let last: { x: number; y: number; z: number } | null = null;

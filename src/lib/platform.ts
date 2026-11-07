@@ -1,6 +1,6 @@
-// 執行環境差異：正式 PWA 與 claude.ai 預覽連結（build --mode artifact）。
-// 預覽連結在受限框架中執行：不能直接下載、不能用動作感測器與系統分享，
-// 存檔改由平台的 downloads 功能請使用者確認。
+// 执行环境差异：正式 PWA 与 claude.ai 预览连结（build --mode artifact）。
+// 预览连结在受限框架中执行：不能直接下载、不能用动作感测器与系统分享，
+// 存档改由平台的 downloads 功能请使用者确认。
 import { downloadBlob } from './card';
 
 export const IS_PREVIEW = import.meta.env.MODE === 'artifact';
@@ -21,7 +21,7 @@ function getSaver(): Promise<Saver | null> {
 
 export type SaveOutcome = 'saved' | 'declined' | 'unavailable';
 
-/** 存檔：正式版直接下載；預覽版請平台跳出確認視窗。 */
+/** 存档：正式版直接下载；预览版请平台跳出确认视窗。 */
 export async function saveFile(data: Blob, filename: string): Promise<SaveOutcome> {
   if (!IS_PREVIEW) {
     downloadBlob(data, filename);

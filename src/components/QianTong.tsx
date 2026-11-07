@@ -3,8 +3,8 @@ import { useEffect, useRef } from 'preact/hooks';
 const STICKS = [-26, -18, -10, -3, 4, 11, 18, 25];
 
 /**
- * 籤筒。shaking 時左右晃動；dropKey 改變時讓一支竹籤從筒口跳出、掉落地面。
- * returning 為 true 時播放把籤放回筒中的動畫。
+ * 签筒。shaking 时左右晃动；dropKey 改变时让一支竹签从筒口跳出、掉落地面。
+ * returning 为 true 时播放把签放回筒中的动画。
  */
 export function QianTong(props: { shaking: boolean; dropKey: number; returning?: boolean; onDropDone?: () => void }) {
   const stick = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ export function QianTong(props: { shaking: boolean; dropKey: number; returning?:
           <rect x="31" y="118" width="98" height="8" fill="#d4a94e" />
           <rect x="35" y="222" width="90" height="8" fill="#d4a94e" />
           <rect x="58" y="142" width="44" height="64" rx="4" fill="#9e2a20" stroke="#d4a94e" stroke-width="2" />
-          <text x="80" y="186" text-anchor="middle" font-size="34" font-weight="700" fill="#f3d58a" font-family="serif">籤</text>
+          <text x="80" y="186" text-anchor="middle" font-size="34" font-weight="700" fill="#f3d58a" font-family="serif">签</text>
         </svg>
         <div class="drop-stick" ref={stick} />
       </div>

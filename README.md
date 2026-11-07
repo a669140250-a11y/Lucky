@@ -1,88 +1,89 @@
-# 今日一籤
+# 今日一签
 
-手機優先的網頁 App（PWA），結合**每日運勢**與**擲筊求籤**。不需要後端或帳號，所有資料只存在本機瀏覽器（localStorage）。
+手机优先的网页 App（PWA），结合**每日运势**与**掷筊求签**。不需要后端或账号，所有数据只保存在本机浏览器（localStorage）。
 
-> 本 App 內容僅供娛樂參考，請勿作為重大決定之依據。
+> 本 App 内容仅供娱乐参考，请勿作为重大决定之依据。
 
 ## 功能
 
-- **首次設定**：暱稱、出生年月日（時辰可選）→ 算出日主（日干）與生肖，之後可在「設定」修改。
-  - 生肖以**立春**換年（與八字年柱一致）。
-  - **晚子時**（23:00 後）出生，日柱依子初換日算到隔天。
-- **今日運勢**：國曆、農曆、日干支、節氣、黃曆宜忌、沖煞；依今日日干與日主的十神關係給出今日主題與運勢句；幸運五行、幸運色、河圖幸運數字；今日日支沖生肖時顯示提醒；可產生 1080×1350 運勢圖卡分享或存圖。
-- **擲筊求籤**：問事 → 稟告 → 擲筊請示 → 搖籤（搖手機或按住按鈕）→ 擲筊確認（一個或連續三個聖筊，可設定）→ 解籤。
-  - 筊杯每片正反各 50%：聖筊 50%、笑筊 25%、陰筊 25%（`src/lib/jiao.ts`，以 `crypto.getRandomValues` 取亂數）。
-- **籤本**：每次求籤自動存檔（日期、問題、籤號、當日干支），可標記應驗與否、加註記；可匯出／匯入 JSON 備份。
-- 動畫（籤筒搖晃、竹籤掉出、筊杯 3D 翻轉落地）、Web Audio 合成音效、Android 震動回饋、深色模式。
+- **首次设置**：昵称、出生年月日（时辰可选）→ 算出日主（日干）与生肖，之后可在“设置”修改。
+  - 生肖以**立春**换年（与八字年柱一致）。
+  - **晚子时**（23:00 后）出生，日柱依子初换日算到隔天。
+- **今日运势**：公历、农历、日干支、节气、黄历宜忌、冲煞；依今日日干与日主的十神关系给出今日主题与运势句；幸运五行、幸运色、河图幸运数字；今日日支冲生肖时显示提醒；可产生 1080×1350 运势卡片分享或保存图片。
+- **掷筊求签**：问事 → 禀告 → 掷筊请示 → 摇签（摇手机或按住按钮）→ 掷筊确认（一个或连续三个圣筊，可设置）→ 解签。
+  - 筊杯每片正反各 50%：圣筊 50%、笑筊 25%、阴筊 25%（`src/lib/jiao.ts`，以 `crypto.getRandomValues` 取乱数）。
+- **签本**：每次求签自动存档（日期、问题、签号、当日干支），可标记应验与否、加备注；可导出／导入 JSON 备份。
+- 动画（签筒摇晃、竹签掉出、筊杯 3D 翻转落地）、Web Audio 合成音效、Android 震动反馈、深色模式。
 
-## 開發
+## 开发
 
 ```bash
 npm install
-npm run dev        # 開發伺服器
-npm test           # 單元測試（曆法、十神、幸運五行、筊杯機率、籤詩資料完整性）
-npm run build      # 產生 dist/（靜態檔，可放到任何 HTTPS 主機）
-npm run preview    # 預覽 build 結果
-npm run build:artifact -- 輸出.html   # 產生單一 HTML 預覽版（JS／CSS 內嵌，無 Service Worker、無搖動偵測）
+npm run dev        # 开发伺服器
+npm test           # 单元测试（历法、十神、幸运五行、筊杯机率、签诗资料完整性）
+npm run build      # 产生 dist/（静态档，可放到任何 HTTPS 主机）
+npm run preview    # 预览 build 结果
+npm run build:artifact -- 输出.html   # 产生单一 HTML 预览版（JS／CSS 内嵌，无 Service Worker、无摇动侦测）
 ```
 
-技術：Vite + Preact + TypeScript、`vite-plugin-pwa`、[`lunar-javascript`](https://github.com/6tail/lunar-javascript)（干支、農曆、宜忌、沖煞、八字一律由它計算）。
+技术：Vite + Preact + TypeScript、`vite-plugin-pwa`、[`lunar-javascript`](https://github.com/6tail/lunar-javascript)（干支、农历、宜忌、冲煞、八字一律由它计算）。
 
-## 想調整內容？
+## 想调整内容？
 
-| 想改的東西 | 檔案 |
+| 想改的东西 | 文件 |
 |---|---|
-| 十神主題、運勢句、幸運五行規則、五行顏色與數字、沖生肖提醒文字 | `src/data/fortune-rules.json` |
-| 籤詩的白話解說、六類建議、吉凶等級 | `src/data/qian-readings.json` |
-| 籤詩原文 | `src/data/qian-poems.json`（由腳本產生，請勿手改，見下方） |
+| 十神主题、运势句、幸运五行规则、五行颜色与数字、冲生肖提醒文字 | `src/data/fortune-rules.json` |
+| 签诗的白话解说、六类建议、吉凶等级 | `src/data/qian-readings.json` |
+| 签诗原文 | `src/data/qian-poems.json`（繁体核对定稿）与 `qian-poems-hans.json`（App 显示用的简体版），皆由脚本产生，请勿手改，见下方 |
 
-`fortune-rules.json` 的文字可自由修改，`{dayGz}`、`{shengxiao}` 等大括號會自動代入。改完執行 `npm test` 可檢查格式。
+`fortune-rules.json` 的文字可自由修改，`{dayGz}`、`{shengxiao}` 等大括号会自动代入。改完执行 `npm test` 可检查格式。
 
-## 籤詩原文的來源與核對
+## 签诗原文的来源与核对
 
-傳統六十甲子籤原文**不是憑記憶產生**，而是從三個來源下載後逐字比對：
+传统六十甲子签原文**不是凭记忆产生**，而是从三个来源下载后逐字比对：
 
-1. 高雄三鳳宮（廟方官網）
-2. 台灣好廟網・籤卦結緣讚
-3. 台東東海龍門天聖宮（廟方官網）
+1. 高雄三凤宫（庙方官网）
+2. 台湾好庙网・签卦结缘赞
+3. 台东东海龙门天圣宫（庙方官网）
 
-規則：每一欄（干支、屬性、四句詩）兩家以上相同即採用；三家皆異者人工裁定並寫明理由。360 欄中 336 欄三家完全一致，24 欄有差異，逐筆列在 **[docs/籤詩核對報告.md](docs/籤詩核對報告.md)**；差異也會在 App 解籤頁的「版本異文」中顯示。
+规则：每一栏（干支、属性、四句诗）两家以上相同即采用；三家皆异者人工裁定并写明理由。360 栏中 336 栏三家完全一致，24 栏有差异，逐笔列在 **[docs/签诗核对报告.md](docs/签诗核对报告.md)**；差异也会在 App 解签页的“版本异文”中显示。
 
-重新核對：
+重新核对：
 
 ```bash
-bash scripts/qian/fetch.sh                 # 下載三個來源到 .cache/qian-sources
-python3 -I scripts/qian/build.py           # 比對並重新產生 qian-poems.json 與核對報告
+bash scripts/qian/fetch.sh                 # 下载三个来源到 .cache/qian-sources
+python3 -I scripts/qian/build.py           # 比对并重新产生 qian-poems.json 与核对报告
+node scripts/gen-poems-hans.mjs            # 由繁体定稿转出简体版 qian-poems-hans.json
 ```
 
-白話解說、分類建議與吉凶等級皆為本 App 原創撰寫；吉凶等級依詩意與傳統籤解綜合評定，各廟版本不一。
+白话解说、分类建议与吉凶等级皆为本 App 原创撰写；吉凶等级依诗意与传统签解综合评定，各庙版本不一。
 
-## 其他腳本
+## 其他脚本
 
-- `node scripts/gen-lunar-cht.mjs`：把 lunar-javascript 內建的簡體詞庫以 OpenCC 轉成繁體語言包（`src/data/lunar-cht.json`），少數曆法用字（如地支「丑」）在腳本中人工指定。
-- `node scripts/gen-icons.mjs`：由 `scripts/icon.svg` 產生 PWA 圖示（需 Playwright）。
+- `node scripts/gen-poems-hans.mjs`：以 OpenCC 把繁体核对定稿的签诗转成简体（核对时以三个台湾来源的繁体原文逐字比对，因此定稿保留繁体）。
+- `node scripts/gen-icons.mjs`：由 `scripts/icon.svg` 产生 PWA 图示（需 Playwright）。
 
-## 部署（之後要上線時）
+## 部署（之后要上线时）
 
-搖動偵測（DeviceMotion）**必須在 HTTPS 下**才能使用，所以請放在 HTTPS 網址：
+摇动侦测（DeviceMotion）**必须在 HTTPS 下**才能使用，所以请放在 HTTPS 网址：
 
-- `npm run build` 後把 `dist/` 整個資料夾上傳到任何靜態網站主機即可（GitHub Pages、Cloudflare Pages、Netlify 等）。
-- `vite.config.ts` 已設定 `base: './'`，放在網域根目錄或子路徑（例如 `https://帳號.github.io/Lucky/`）都能運作。
-- 若用 GitHub Pages：免費方案需要把 repo 設為公開；到 Settings → Pages 選擇來源即可。
+- `npm run build` 后把 `dist/` 整个资料夹上传到任何静态网站主机即可（GitHub Pages、Cloudflare Pages、Netlify 等）。
+- `vite.config.ts` 已设置 `base: './'`，放在网域根目录或子路径（例如 `https://账号.github.io/Lucky/`）都能运作。
+- 若用 GitHub Pages：免费方案需要把 repo 设为公开；到 Settings → Pages 选择来源即可。
 
-## 加到手機主畫面
+## 加到手机主屏幕
 
 **iPhone（Safari）**
-1. 用 Safari 開啟網址（其他瀏覽器在 iOS 上可能沒有此選項）。
-2. 點下方工具列的「分享」按鈕（方框加向上箭頭）。
-3. 往下滑，點「加入主畫面」。
-4. 名稱保留「今日一籤」，點右上角「加入」。
-5. 從主畫面圖示開啟，就是全螢幕 App。第一次搖籤時點「啟用搖一搖」並允許「動作與方向」存取。
+1. 用 Safari 开启网址（其他浏览器在 iOS 上可能没有此选项）。
+2. 点下方工具列的“分享”按钮（方框加向上箭头）。
+3. 往下滑，点“添加到主屏幕”。
+4. 名称保留“今日一签”，点右上角“加入”。
+5. 从主屏幕图标打开，就是全屏 App。第一次摇签时点“启用摇一摇”，并允许访问“运动与方向”。
 
 **Android（Chrome）**
-1. 用 Chrome 開啟網址。
-2. 點右上角「⋮」選單。
-3. 點「安裝應用程式」或「加到主畫面」。
-4. 確認「安裝／新增」，主畫面就會出現圖示。
+1. 用 Chrome 开启网址。
+2. 点右上角“⋮”选单。
+3. 点“安装应用”或“添加到主屏幕”。
+4. 确认“安装／新增”，主屏幕就会出现图标。
 
-> 資料存在該瀏覽器的本機儲存空間：從主畫面開啟的 App 與在瀏覽器分頁開啟的網站，在 iPhone 上可能是**兩份不同的資料**。建議固定從主畫面圖示開啟，並定期在「設定 → 匯出備份」。
+> 数据保存在该浏览器的本地存储里：从主屏幕开启的 App 与在浏览器分页开启的网站，在 iPhone 上可能是**两份不同的数据**。建议固定从主屏幕图标打开，并定期在“设置 → 导出备份”。

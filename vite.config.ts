@@ -3,20 +3,20 @@ import preact from '@preact/preset-vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => ({
-  // 相對路徑：之後不論部署到網域根目錄或子路徑（如 GitHub Pages 的 /Lucky/）都能運作
+  // 相对路径：之后不论部署到网域根目录或子路径（如 GitHub Pages 的 /Lucky/）都能运作
   base: './',
   plugins: [
     preact(),
-    // 預覽連結版（--mode artifact）沒有 Service Worker，不產生 PWA 檔案
+    // 预览连结版（--mode artifact）没有 Service Worker，不产生 PWA 文件
     mode !== 'artifact' &&
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: '今日一籤',
-        short_name: '今日一籤',
-        description: '每日運勢與擲筊求籤（僅供娛樂）',
-        lang: 'zh-Hant-TW',
+        name: '今日一签',
+        short_name: '今日一签',
+        description: '每日运势与掷筊求签（仅供娱乐）',
+        lang: 'zh-CN',
         start_url: '.',
         scope: '.',
         display: 'standalone',
@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,json,webmanifest}'],
-        // 宋體網路字型：離線時沿用快取
+        // 宋体网络字型：离线时沿用快取
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/,

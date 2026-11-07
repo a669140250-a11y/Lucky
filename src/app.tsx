@@ -26,12 +26,12 @@ import { Settings } from './screens/Settings';
 type Tab = 'home' | 'draw' | 'journal' | 'settings';
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'home', label: '今日', icon: 'today' },
-  { id: 'draw', label: '求籤', icon: 'draw' },
-  { id: 'journal', label: '籤本', icon: 'book' },
-  { id: 'settings', label: '設定', icon: 'settings' },
+  { id: 'draw', label: '求签', icon: 'draw' },
+  { id: 'journal', label: '签本', icon: 'book' },
+  { id: 'settings', label: '设置', icon: 'settings' },
 ];
 
-// 啟動時外層（例如預覽連結的檢視器）可能已設定 data-theme，「跟隨系統」時還原它
+// 启动时外层（例如预览连结的检视器）可能已设置 data-theme，“跟随系统”时还原它
 const hostTheme = document.documentElement.dataset.theme;
 
 function applyTheme(pref: S['theme']) {
@@ -52,7 +52,7 @@ export function App() {
   const [tab, setTab] = useState<Tab>('home');
   const [now, setNow] = useState(() => new Date());
 
-  // 主題、音效、震動
+  // 主题、音效、震动
   useEffect(() => {
     applyTheme(settings.theme);
     setSoundEnabled(settings.sound);
@@ -63,7 +63,7 @@ export function App() {
     return () => mq.removeEventListener?.('change', on);
   }, [settings]);
 
-  // 跨日時自動更新（回到前景或每分鐘檢查）
+  // 跨日时自动更新（回到前景或每分钟检查）
   useEffect(() => {
     const tick = () => setNow((old) => (dateKey(old) === dateKey(new Date()) ? old : new Date()));
     const id = setInterval(tick, 60_000);
@@ -100,15 +100,15 @@ export function App() {
     return (
       <div class="app onboarding">
         <div class="hero">
-          <div class="hero-seal">籤</div>
-          <h1>今日一籤</h1>
-          <p>每日運勢・擲筊求籤</p>
+          <div class="hero-seal">签</div>
+          <h1>今日一签</h1>
+          <p>每日运势・掷筊求签</p>
         </div>
         <div class="card">
-          <h2 class="card-title">初次見面，先認識你</h2>
-          <p class="hint">輸入暱稱與生日，就能算出你的日主與生肖，提供每日運勢。之後可在設定中修改。</p>
+          <h2 class="card-title">初次见面，先认识你</h2>
+          <p class="hint">输入昵称与生日，就能算出你的日主与生肖，提供每日运势。之后可在设置中修改。</p>
           <ProfileForm
-            submitLabel="開始使用"
+            submitLabel="开始使用"
             onSubmit={(p) => {
               saveProfile(p);
               setProfile(p);
@@ -173,7 +173,7 @@ export function App() {
           />
         )}
       </main>
-      <nav class="tabbar" aria-label="主選單">
+      <nav class="tabbar" aria-label="主菜单">
         {TABS.map((t) => (
           <button key={t.id} class={tab === t.id ? 'on' : ''} aria-current={tab === t.id ? 'page' : undefined} onClick={() => switchTab(t.id)}>
             <Icon name={t.icon} />

@@ -1,4 +1,4 @@
-// 震動回饋：Android 瀏覽器支援 navigator.vibrate；iOS Safari 不支援，會自動略過。
+// 震动反馈：Android 浏览器支援 navigator.vibrate；iOS Safari 不支援，会自动略过。
 let enabled = true;
 export function setVibrateEnabled(on: boolean) {
   enabled = on;

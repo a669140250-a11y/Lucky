@@ -4,7 +4,7 @@ import { useEffect } from 'preact/hooks';
 export function Footer() {
   return (
     <footer class="disclaimer">
-      本 App 內容僅供娛樂參考，請勿作為重大決定之依據。
+      本 App 内容仅供娱乐参考，请勿作为重大决定之依据。
     </footer>
   );
 }
@@ -34,7 +34,7 @@ export function Modal(props: { open: boolean; onClose: () => void; title: string
       <div class="modal" role="dialog" aria-modal="true" aria-label={props.title} onClick={(e) => e.stopPropagation()}>
         <div class="modal-head">
           <h2>{props.title}</h2>
-          <button class="icon-btn" aria-label="關閉" onClick={props.onClose}>
+          <button class="icon-btn" aria-label="关闭" onClick={props.onClose}>
             <Icon name="close" />
           </button>
         </div>

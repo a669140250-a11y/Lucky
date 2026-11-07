@@ -1,4 +1,4 @@
-import poems from '../data/qian-poems.json';
+import poems from '../data/qian-poems-hans.json';
 import readings from '../data/qian-readings.json';
 import type { CategoryId } from './storage';
 
@@ -22,7 +22,7 @@ type Reading = { grade: Grade; plain: string; advice: Record<CategoryId, string>
 export function getQian(no: number): Qian {
   const p = poems.poems[no - 1];
   const r = (readings.readings as Record<string, Reading>)[String(no)];
-  if (!p || p.no !== no || !r) throw new Error(`沒有第 ${no} 籤`);
+  if (!p || p.no !== no || !r) throw new Error(`没有第 ${no} 签`);
   return {
     no,
     ganzhi: p.ganzhi,

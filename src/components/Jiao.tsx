@@ -3,18 +3,18 @@ import { playJiaoLand, playWhoosh, unlockAudio } from '../lib/audio';
 import { vibrate } from '../lib/haptics';
 import { type Face, JIAO_LABEL, type Toss, toss } from '../lib/jiao';
 
-/** 單片筊杯：正面＝平面朝上、背面＝凸面朝上，以 3D 翻轉呈現。 */
+/** 单片筊杯：正面＝平面朝上、背面＝凸面朝上，以 3D 翻转呈现。 */
 function Block(props: { mirror?: boolean }) {
-  // 半月形：上緣為弧背，下緣為內凹弧
+  // 半月形：上缘为弧背，下缘为内凹弧
   const path = 'M4 46C4 20 30 3 60 3s56 17 56 43c-2 3-7 4-11 2C93 40 78 36 60 36S27 40 15 48c-4 2-9 1-11-2Z';
   return (
     <div class={`jiao-block ${props.mirror ? 'mirror' : ''}`}>
-      {/* 平面朝上：顏色較淺、平整，有木紋 */}
+      {/* 平面朝上：颜色较浅、平整，有木纹 */}
       <svg class="face flat" viewBox="0 0 120 52" aria-hidden="true">
         <path d={path} fill="#e0806a" stroke="#8a2b1d" stroke-width="2.5" />
         <path d="M18 38c12-8 26-12 42-12s30 4 42 12M26 26c10-6 22-9 34-9s24 3 34 9" fill="none" stroke="#b5503d" stroke-opacity=".55" stroke-width="1.6" />
       </svg>
-      {/* 凸面朝上：深紅、有立體光澤 */}
+      {/* 凸面朝上：深红、有立体光泽 */}
       <svg class="face round" viewBox="0 0 120 52" aria-hidden="true">
         <defs>
           <radialGradient id="jr" cx=".42" cy=".3" r=".75">
@@ -30,7 +30,7 @@ function Block(props: { mirror?: boolean }) {
   );
 }
 
-const FACES_TEXT = { sheng: '一平一凸', xiao: '兩面皆平', yin: '兩面皆凸' } as const;
+const FACES_TEXT = { sheng: '一平一凸', xiao: '两面皆平', yin: '两面皆凸' } as const;
 
 const reduce = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -54,7 +54,7 @@ function animateBlock(el: HTMLElement, face: Face, side: -1 | 1, delay: number):
 }
 
 export interface JiaoThrowProps {
-  /** 每次擲完呼叫；回傳 false 表示要停在結果畫面不再允許擲。 */
+  /** 每次掷完呼叫；回传 false 表示要停在结果画面不再允许掷。 */
   onResult: (t: Toss) => void;
   label?: string;
   disabled?: boolean;
@@ -115,7 +115,7 @@ export function JiaoThrow(props: JiaoThrowProps) {
       {props.hint && <p class="hint center">{props.hint}</p>}
       {!props.disabled && (
         <button class="btn primary big" onClick={go} disabled={busy}>
-          {busy ? '筊杯落地中…' : (props.label ?? '擲筊')}
+          {busy ? '筊杯落地中…' : (props.label ?? '掷筊')}
         </button>
       )}
     </div>
@@ -125,9 +125,9 @@ export function JiaoThrow(props: JiaoThrowProps) {
 export function JiaoLegend() {
   return (
     <ul class="jiao-legend">
-      <li><b>聖筊</b>一平一凸，表示應允</li>
-      <li><b>笑筊</b>兩平面朝上，神明笑而不答</li>
-      <li><b>陰筊</b>兩凸面朝上，表示不允</li>
+      <li><b>圣筊</b>一平一凸，表示应允</li>
+      <li><b>笑筊</b>两平面朝上，神明笑而不答</li>
+      <li><b>阴筊</b>两凸面朝上，表示不允</li>
     </ul>
   );
 }

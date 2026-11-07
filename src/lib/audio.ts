@@ -1,4 +1,4 @@
-// 所有音效都用 Web Audio 即時合成，不載入任何音檔。
+// 所有音效都用 Web Audio 即时合成，不加载任何音档。
 let ctx: AudioContext | null = null;
 let enabled = true;
 let noise: AudioBuffer | null = null;
@@ -7,7 +7,7 @@ export function setSoundEnabled(on: boolean) {
   enabled = on;
 }
 
-/** 必須在使用者手勢（點擊）中呼叫一次，iOS 才允許發聲。 */
+/** 必须在使用者手势（点击）中呼叫一次，iOS 才允许发声。 */
 export function unlockAudio(): void {
   try {
     if (!ctx) {
@@ -35,7 +35,7 @@ function noiseBuffer(c: AudioContext): AudioBuffer {
   return noise;
 }
 
-/** 一聲木頭撞擊：帶通濾波的雜訊 + 低頻短音。 */
+/** 一声木头撞击：带通滤波的杂讯 + 低频短音。 */
 function knock(c: AudioContext, t: number, opt: { freq: number; q: number; decay: number; gain: number; body?: number }) {
   const src = c.createBufferSource();
   src.buffer = noiseBuffer(c);
@@ -66,7 +66,7 @@ function knock(c: AudioContext, t: number, opt: { freq: number; q: number; decay
   }
 }
 
-/** 筊杯落地：兩片先後著地，再各彈一下。 */
+/** 筊杯落地：两片先后着地，再各弹一下。 */
 export function playJiaoLand(): void {
   const c = ready();
   if (!c) return;
@@ -77,7 +77,7 @@ export function playJiaoLand(): void {
   knock(c, t + 0.25, { freq: 1500, q: 5, decay: 0.06, gain: 0.25 });
 }
 
-/** 筊杯拋起時的輕微風聲。 */
+/** 筊杯抛起时的轻微风声。 */
 export function playWhoosh(): void {
   const c = ready();
   if (!c) return;
@@ -99,7 +99,7 @@ export function playWhoosh(): void {
   src.stop(t + 0.55);
 }
 
-/** 竹籤互相碰撞的一小串聲音（搖籤筒時重複呼叫）。 */
+/** 竹签互相碰撞的一小串声音（摇签筒时重复呼叫）。 */
 export function playRattle(intensity = 1): void {
   const c = ready();
   if (!c) return;
@@ -115,7 +115,7 @@ export function playRattle(intensity = 1): void {
   }
 }
 
-/** 竹籤掉出落地。 */
+/** 竹签掉出落地。 */
 export function playStickDrop(): void {
   const c = ready();
   if (!c) return;
@@ -125,7 +125,7 @@ export function playStickDrop(): void {
   knock(c, t + 0.17, { freq: 2400, q: 6, decay: 0.04, gain: 0.25 });
 }
 
-/** 寺廟磬聲：數個不諧和泛音、長尾音。 */
+/** 寺庙磬声：数个不谐和泛音、长尾音。 */
 export function playBell(base = 392): void {
   const c = ready();
   if (!c) return;
@@ -151,7 +151,7 @@ export function playBell(base = 392): void {
   }
 }
 
-/** 不成功時的低沉木魚聲。 */
+/** 不成功时的低沉木鱼声。 */
 export function playLow(): void {
   const c = ready();
   if (!c) return;

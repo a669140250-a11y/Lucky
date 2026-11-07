@@ -19,7 +19,7 @@ export function Settings(props: Props) {
   const { settings: s } = props;
   const [savedMsg, setSavedMsg] = useState('');
   const [dataMsg, setDataMsg] = useState('');
-  const [pending, setPending] = useState<Backup | null>(null); // 等待確認的匯入
+  const [pending, setPending] = useState<Backup | null>(null); // 等待确认的导入
   const [askClear, setAskClear] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<S>) => props.onSettings({ ...s, ...patch });
@@ -27,8 +27,8 @@ export function Settings(props: Props) {
   const exportData = async () => {
     const blob = new Blob([JSON.stringify(makeBackup(), null, 1)], { type: 'application/json' });
     const d = new Date();
-    const r = await saveFile(blob, `今日一籤備份-${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}.json`);
-    setDataMsg(r === 'saved' ? '已匯出備份檔。' : r === 'declined' ? '' : '這裡無法存檔，請改用正式版匯出。');
+    const r = await saveFile(blob, `今日一签备份-${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}.json`);
+    setDataMsg(r === 'saved' ? '已导出备份文件。' : r === 'declined' ? '' : '这里无法保存文件，请改用正式版导出。');
   };
 
   const importData = async (e: Event) => {
@@ -38,7 +38,7 @@ export function Settings(props: Props) {
       setPending(parseBackup(await f.text()));
       setDataMsg('');
     } catch (err) {
-      setDataMsg(`匯入失敗：${(err as Error).message}`);
+      setDataMsg(`导入失败：${(err as Error).message}`);
     } finally {
       (e.target as HTMLInputElement).value = '';
     }
@@ -46,16 +46,16 @@ export function Settings(props: Props) {
 
   return (
     <section class="screen-body">
-      <ScreenHeader title="設定" />
+      <ScreenHeader title="设置" />
 
       <div class="card">
-        <h2 class="card-title">個人資料</h2>
+        <h2 class="card-title">个人资料</h2>
         <ProfileForm
           initial={props.profile}
-          submitLabel="儲存個人資料"
+          submitLabel="保存个人资料"
           onSubmit={(p) => {
             props.onProfile(p);
-            setSavedMsg('已儲存。');
+            setSavedMsg('已保存。');
             setTimeout(() => setSavedMsg(''), 2000);
           }}
         />
@@ -63,28 +63,28 @@ export function Settings(props: Props) {
       </div>
 
       <div class="card">
-        <h2 class="card-title">求籤</h2>
+        <h2 class="card-title">求签</h2>
         <fieldset class="radio-group">
-          <legend>擲筊確認籤支</legend>
+          <legend>掷筊确认签支</legend>
           <label>
             <input type="radio" name="cm" checked={s.confirmMode === 1} onChange={() => set({ confirmMode: 1 })} />
-            一個聖筊即可（預設）
+            一个圣筊即可（默认）
           </label>
           <label>
             <input type="radio" name="cm" checked={s.confirmMode === 3} onChange={() => set({ confirmMode: 3 })} />
-            需連續三個聖筊
+            需连续三个圣筊
           </label>
         </fieldset>
       </div>
 
       <div class="card">
-        <h2 class="card-title">外觀與回饋</h2>
+        <h2 class="card-title">外观与反馈</h2>
         <fieldset class="radio-group inline">
           <legend>深色模式</legend>
           {(['system', 'light', 'dark'] as ThemePref[]).map((t) => (
             <label key={t}>
               <input type="radio" name="theme" checked={s.theme === t} onChange={() => set({ theme: t })} />
-              {t === 'system' ? '跟隨系統' : t === 'light' ? '淺色' : '深色'}
+              {t === 'system' ? '跟随系统' : t === 'light' ? '浅色' : '深色'}
             </label>
           ))}
         </fieldset>
@@ -94,24 +94,24 @@ export function Settings(props: Props) {
         </label>
         <label class="switch">
           <span>
-            震動回饋
-            {!canVibrate() && <small class="hint">（此裝置不支援，例如 iPhone）</small>}
+            震动反馈
+            {!canVibrate() && <small class="hint">（此设备不支持，例如 iPhone）</small>}
           </span>
           <input type="checkbox" checked={s.vibrate} onChange={(e) => set({ vibrate: (e.target as HTMLInputElement).checked })} />
         </label>
       </div>
 
       <div class="card">
-        <h2 class="card-title">資料</h2>
-        <p class="hint">所有資料只存在本機瀏覽器。清除瀏覽器資料會一併刪除，建議定期匯出備份。</p>
+        <h2 class="card-title">数据</h2>
+        <p class="hint">所有数据只保存在本机浏览器。清除浏览器数据会一并删除，建议定期导出备份。</p>
         <div class="row">
-          <button class="btn ghost" onClick={exportData}>匯出備份</button>
-          <button class="btn ghost" onClick={() => fileRef.current?.click()}>匯入備份</button>
+          <button class="btn ghost" onClick={exportData}>导出备份</button>
+          <button class="btn ghost" onClick={() => fileRef.current?.click()}>导入备份</button>
           <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={importData} />
         </div>
         {pending && (
-          <div class="confirm-box" role="group" aria-label="確認匯入">
-            <p>以備份檔取代目前資料？備份內有籤本 {pending.journal.length} 筆，目前的資料會被覆蓋。</p>
+          <div class="confirm-box" role="group" aria-label="确认导入">
+            <p>用备份文件替换当前数据？备份内有签本 {pending.journal.length} 笔，当前的数据会被覆盖。</p>
             <div class="row">
               <button class="btn ghost" onClick={() => setPending(null)}>取消</button>
               <button
@@ -119,41 +119,41 @@ export function Settings(props: Props) {
                 onClick={() => {
                   props.onImport(pending);
                   setPending(null);
-                  setDataMsg('已匯入備份。');
+                  setDataMsg('已导入备份。');
                 }}
               >
-                確定匯入
+                确定导入
               </button>
             </div>
           </div>
         )}
         {askClear ? (
-          <div class="confirm-box danger" role="group" aria-label="確認清除">
-            <p>清除個人資料、設定與全部籤本？此動作無法復原。</p>
+          <div class="confirm-box danger" role="group" aria-label="确认清除">
+            <p>清除个人资料、设置与全部签本？此操作无法恢复。</p>
             <div class="row">
               <button class="btn ghost" onClick={() => setAskClear(false)}>取消</button>
-              <button class="btn primary" onClick={() => props.onClear()}>確定清除</button>
+              <button class="btn primary" onClick={() => props.onClear()}>确定清除</button>
             </div>
           </div>
         ) : (
           <button class="link danger" onClick={() => setAskClear(true)}>
-            清除所有資料
+            清除所有数据
           </button>
         )}
         {dataMsg && <p class="hint" role="status">{dataMsg}</p>}
       </div>
 
       <div class="card about">
-        <h2 class="card-title">關於</h2>
+        <h2 class="card-title">关于</h2>
         <p>
-          曆法、干支、黃曆宜忌由開源函式庫 lunar-javascript 計算。籤詩為傳統六十甲子籤，原文依下列三個來源逐字比對、多數決定稿；白話解說、分類建議與吉凶等級為本 App 撰寫。
+          历法、干支、黄历宜忌由开源函数库 lunar-javascript 计算。签诗为传统六十甲子签，原文依下列三个来源逐字比对、多数决定稿；白话解说、分类建议与吉凶等级为本 App 撰写。
         </p>
         <ul>
           {SOURCES.map((x) => (
             <li key={x.id}>{x.name}</li>
           ))}
         </ul>
-        <p>運勢規則：依今日日干與日主的十神關係判斷；官殺、食傷取印，財取比劫，印、比劫取食傷為幸運五行；幸運數字取河圖數。</p>
+        <p>运势规则：依今日日干与日主的十神关系判断；官杀、食伤取印，财取比劫，印、比劫取食伤为幸运五行；幸运数字取河图数。</p>
       </div>
 
       <Footer />

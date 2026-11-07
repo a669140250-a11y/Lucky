@@ -1,4 +1,4 @@
-// lunar-javascript 沒有附型別；這裡只宣告本 App 用到的部分。
+// lunar-javascript 没有附型别；这里只宣告本 App 用到的部分。
 declare module 'lunar-javascript' {
   export interface JieQi {
     getName(): string;

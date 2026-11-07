@@ -25,8 +25,8 @@ export function ProfileForm(props: { initial?: Profile | null; submitLabel: stri
 
   const name = nickname.trim();
   const errors = {
-    nickname: !name ? '請輸入暱稱' : '',
-    date: !parsed ? '請選擇 1901–2099 年之間的出生日期' : '',
+    nickname: !name ? '请输入昵称' : '',
+    date: !parsed ? '请选择 1901–2099 年之间的出生日期' : '',
   };
   const ok = !errors.nickname && !errors.date;
 
@@ -40,7 +40,7 @@ export function ProfileForm(props: { initial?: Profile | null; submitLabel: stri
   return (
     <form class="profile-form" onSubmit={submit} noValidate>
       <label class="field">
-        <span>暱稱</span>
+        <span>昵称</span>
         <input
           type="text"
           value={nickname}
@@ -53,7 +53,7 @@ export function ProfileForm(props: { initial?: Profile | null; submitLabel: stri
       </label>
 
       <label class="field">
-        <span>出生日期（國曆）</span>
+        <span>出生日期（公历）</span>
         <input
           type="date"
           value={date}
@@ -65,16 +65,16 @@ export function ProfileForm(props: { initial?: Profile | null; submitLabel: stri
       </label>
 
       <label class="field">
-        <span>出生時辰（可不填）</span>
+        <span>出生时辰（可不填）</span>
         <select value={hour} onChange={(e) => setHour((e.target as HTMLSelectElement).value as HourKey | '')}>
-          <option value="">不確定／不填</option>
+          <option value="">不确定／不填</option>
           {HOURS.map((h) => (
             <option key={h.key} value={h.key}>
               {h.label}（{h.range}）
             </option>
           ))}
         </select>
-        <small class="hint">晚子時（23:00 後）出生，日柱依子初換日算到隔天。</small>
+        <small class="hint">晚子时（23:00 后）出生，日柱依子初换日算到隔天。</small>
       </label>
 
       {bazi && (
@@ -82,12 +82,12 @@ export function ProfileForm(props: { initial?: Profile | null; submitLabel: stri
           <div>
             <span class="k">日主</span>
             <b>{bazi.dayMaster}{bazi.element}</b>
-            <small>（{bazi.yang ? '陽' : '陰'}{bazi.element}）</small>
+            <small>（{bazi.yang ? '阳' : '阴'}{bazi.element}）</small>
           </div>
           <div>
             <span class="k">生肖</span>
             <b>{bazi.shengxiao}</b>
-            <small>（以立春換年）</small>
+            <small>（以立春换年）</small>
           </div>
           <div class="wide">
             <span class="k">四柱</span>
@@ -96,13 +96,13 @@ export function ProfileForm(props: { initial?: Profile | null; submitLabel: stri
             </b>
           </div>
           <div class="wide">
-            <span class="k">農曆</span>
+            <span class="k">农历</span>
             <span>{bazi.lunarBirth}</span>
           </div>
         </div>
       )}
 
-      <p class="hint">資料只存在這支手機的瀏覽器裡，不會上傳。</p>
+      <p class="hint">数据只保存在这部手机的浏览器里，不会上传。</p>
       <button type="submit" class="btn primary big">{props.submitLabel}</button>
     </form>
   );

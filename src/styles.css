@@ -1,4 +1,4 @@
-/* ===== 色彩與字型 ===== */
+/* ===== 色彩与字型 ===== */
 :root {
   --bg: #f6efe2;
   --bg-2: #efe3cc;
@@ -23,8 +23,8 @@
   --bad-bg: #f7e1dc;
   --shadow: 0 1px 2px rgba(80, 45, 15, 0.06), 0 6px 18px rgba(80, 45, 15, 0.08);
   --radius: 18px;
-  --serif: 'Noto Serif TC', 'Songti TC', 'STSong', 'PMingLiU', 'MingLiU', serif;
-  --sans: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  --serif: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   --tabbar-h: 64px;
   color-scheme: light;
 }
@@ -82,7 +82,7 @@
   color-scheme: dark;
 }
 
-/* ===== 基礎 ===== */
+/* ===== 基础 ===== */
 *,
 *::before,
 *::after {
@@ -145,7 +145,7 @@ textarea {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
-/* ===== 標頭 ===== */
+/* ===== 标头 ===== */
 .screen-header {
   display: flex;
   align-items: flex-end;
@@ -231,7 +231,7 @@ textarea {
   margin-left: 8px;
 }
 
-/* ===== 按鈕 ===== */
+/* ===== 按钮 ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -322,7 +322,7 @@ textarea {
   margin: 0;
 }
 
-/* ===== 表單 ===== */
+/* ===== 表单 ===== */
 .field {
   display: block;
   margin-bottom: 14px;
@@ -342,7 +342,7 @@ textarea {
   border-radius: 12px;
   border: 1px solid var(--line);
   background: var(--surface-2);
-  font-size: 16px; /* 避免 iOS 自動放大 */
+  font-size: 16px; /* 避免 iOS 自动放大 */
   appearance: none;
   -webkit-appearance: none;
 }
@@ -429,7 +429,7 @@ input[type='checkbox'] {
   border-top: 1px solid var(--line);
 }
 
-/* ===== 啟始頁 ===== */
+/* ===== 启始页 ===== */
 .hero {
   text-align: center;
   padding: 16px 0 22px;
@@ -460,7 +460,7 @@ input[type='checkbox'] {
   box-shadow: inset 0 0 0 3px #d4a94e, 0 8px 22px rgba(126, 31, 23, 0.35);
 }
 
-/* ===== 首頁 ===== */
+/* ===== 首页 ===== */
 .date-card {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -657,7 +657,7 @@ input[type='checkbox'] {
 .el-金 { color: var(--gold); }
 .el-水 { color: var(--ink); }
 
-/* ===== 底部導覽 ===== */
+/* ===== 底部导览 ===== */
 .tabbar {
   position: fixed;
   left: 0;
@@ -693,7 +693,7 @@ input[type='checkbox'] {
   font-weight: 700;
 }
 
-/* ===== 步驟列 ===== */
+/* ===== 步骤列 ===== */
 .steps {
   list-style: none;
   padding: 0;
@@ -734,7 +734,7 @@ input[type='checkbox'] {
   border-color: transparent;
 }
 
-/* ===== 求籤：類別 ===== */
+/* ===== 求签：类别 ===== */
 .cat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -759,7 +759,7 @@ input[type='checkbox'] {
   box-shadow: 0 3px 10px rgba(158, 42, 32, 0.25);
 }
 
-/* ===== 稟告 ===== */
+/* ===== 禀告 ===== */
 .report-text {
   font-family: var(--serif);
   font-size: 17px;
@@ -819,7 +819,7 @@ input[type='checkbox'] {
   position: relative;
   width: 100%;
   height: 100%;
-  transform-style: preserve-3d; /* 不可加 filter，否則 3D 會被攤平 */
+  transform-style: preserve-3d; /* 不可加 filter，否则 3D 会被摊平 */
 }
 .jiao-block.mirror {
   transform: scaleX(-1);
@@ -912,7 +912,7 @@ p.verdict {
   padding: 10px;
 }
 
-/* ===== 籤筒 ===== */
+/* ===== 签筒 ===== */
 .shake-card {
   overflow: hidden;
 }
@@ -1040,7 +1040,7 @@ p.verdict {
   border-color: var(--red);
 }
 
-/* ===== 籤詩 ===== */
+/* ===== 签诗 ===== */
 .qian-head {
   display: flex;
   justify-content: space-between;
@@ -1203,7 +1203,7 @@ p.verdict {
   display: none;
 }
 
-/* ===== 籤本 ===== */
+/* ===== 签本 ===== */
 .empty {
   text-align: center;
   padding: 28px 18px;
@@ -1290,7 +1290,7 @@ p.verdict {
   justify-content: flex-end;
 }
 
-/* ===== 對話框 ===== */
+/* ===== 对话框 ===== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
