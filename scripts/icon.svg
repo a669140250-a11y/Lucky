@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx=".5" cy=".38" r=".75">
+      <stop offset="0" stop-color="#bf4232"/>
+      <stop offset="1" stop-color="#7a1d15"/>
+    </radialGradient>
+    <linearGradient id="tube" x1="0" x2="1">
+      <stop offset="0" stop-color="#9c6a2c"/>
+      <stop offset=".45" stop-color="#e2b866"/>
+      <stop offset="1" stop-color="#8a5a22"/>
+    </linearGradient>
+    <linearGradient id="stick" x1="0" x2="1">
+      <stop offset="0" stop-color="#e7cf9a"/>
+      <stop offset=".5" stop-color="#fbf0d2"/>
+      <stop offset="1" stop-color="#dcbf82"/>
+    </linearGradient>
+  </defs>
+  <rect id="plate" width="512" height="512" fill="url(#bg)"/>
+  <g id="art">
+    <g stroke="#a07a3a" stroke-width="3">
+      <rect x="186" y="150" width="22" height="160" rx="6" fill="url(#stick)" transform="rotate(-12 197 300)"/>
+      <rect x="220" y="128" width="22" height="180" rx="6" fill="url(#stick)" transform="rotate(-5 231 300)"/>
+      <rect x="270" y="132" width="22" height="180" rx="6" fill="url(#stick)" transform="rotate(5 281 300)"/>
+      <rect x="304" y="152" width="22" height="160" rx="6" fill="url(#stick)" transform="rotate(12 315 300)"/>
+      <rect x="245" y="86" width="22" height="210" rx="6" fill="url(#stick)"/>
+    </g>
+    <rect x="245" y="86" width="22" height="40" rx="6" fill="#d8493a"/>
+    <path d="M150 262h212l-18 160a14 14 0 0 1-14 12H182a14 14 0 0 1-14-12L150 262Z" fill="url(#tube)"/>
+    <ellipse cx="256" cy="262" rx="106" ry="18" fill="#5a2a10"/>
+    <ellipse cx="256" cy="262" rx="106" ry="18" fill="none" stroke="#f3d58a" stroke-width="6"/>
+    <rect x="156" y="300" width="200" height="12" fill="#7a1d15" opacity=".55"/>
+    <rect x="168" y="394" width="176" height="12" fill="#7a1d15" opacity=".55"/>
+  </g>
+</svg>

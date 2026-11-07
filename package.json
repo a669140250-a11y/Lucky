@@ -1,0 +1,27 @@
+{
+  "name": "jinri-yiqian",
+  "private": true,
+  "version": "1.0.0",
+  "description": "今日一籤：每日運勢與擲筊求籤（僅供娛樂）",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build:artifact": "tsc --noEmit && vite build --mode artifact --outDir dist-artifact && node scripts/build-artifact.mjs"
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.7.8",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "opencc-js": "^1.4.2",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^3.2.7"
+  }
+}
