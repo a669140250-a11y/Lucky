@@ -244,8 +244,10 @@ main { flex: 1; }
   box-shadow: 0 2px 0 var(--line-strong), var(--shadow-sm);
   transition: transform .15s var(--ease-spring), box-shadow .15s;
 }
-.pill-btn:hover { transform: translateY(-1px); }
-.pill-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--line-strong); }
+@media (hover: hover) {
+  .pill-btn:hover { transform: translateY(-1px); }
+}
+.pill-btn:active { transform: scale(.95); transition-duration: .08s; }
 
 /* ---------- 模式切换 ---------- */
 .mode-switch {
@@ -314,62 +316,91 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
   margin-top: 26px;
 }
+/* “完成”按钮从 0 宽度滑出来，主按钮跟着让位 */
+.action-row {
+  display: grid;
+  grid-template-columns: 0fr 1fr;
+  column-gap: 0;
+  width: min(100%, 340px);
+  transition: grid-template-columns .45s cubic-bezier(.2, .8, .2, 1), column-gap .45s cubic-bezier(.2, .8, .2, 1);
+}
+.action-row.has-done { grid-template-columns: .62fr 1fr; column-gap: 10px; }
+
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 20px;
-  border-radius: 16px;
-  font-weight: 800;
-  line-height: 1.2;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   user-select: none;
   -webkit-user-select: none;
-  transition: transform .14s ease, box-shadow .14s ease, background-color .2s ease, opacity .2s;
+  transition: transform .35s var(--ease-spring), background-color .2s ease, box-shadow .2s ease, color .2s ease, opacity .25s ease;
 }
+/* 按下去轻轻缩一下，放开时弹回来 */
+.btn:active:not(:disabled) { transform: scale(.96); transition-duration: .08s; }
+.btn:disabled { cursor: default; }
+.btn-icon { display: inline-block; font-size: 1.15em; line-height: 1; }
+.btn-label { display: inline-block; }
+
 .btn-primary {
   color: var(--on-accent);
   background: var(--accent);
-  box-shadow: 0 4px 0 var(--accent-deep);
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--accent) 85%, transparent);
 }
-.btn-primary:hover { background: color-mix(in srgb, var(--accent) 90%, var(--on-accent)); transform: translateY(-1px); }
-.btn-primary:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--accent-deep);
+@media (hover: hover) {
+  .btn-primary:hover { background: color-mix(in srgb, var(--accent) 90%, var(--tint-ink)); }
 }
+.btn-primary:active:not(:disabled) { background: var(--accent-deep); }
 .btn-xl {
-  font-size: 19px;
-  padding: 16px 34px;
-  border-radius: 20px;
-  min-width: 232px;
+  width: min(100%, 340px);
+  height: 58px;
+  padding: 0 28px;
+  font-size: 18px;
   letter-spacing: .04em;
 }
-.btn-xl > span:first-child { font-size: 22px; }
+.action-row .btn { width: 100%; }
+
 .btn-soft {
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 3px 0 var(--line-strong), var(--shadow-sm);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
 }
-.btn-soft:active,
-.btn-soft:disabled { transform: translateY(3px); box-shadow: 0 0 0 var(--line-strong); }
-.btn-soft:disabled {
+.btn-done {
+  height: 58px;
+  min-width: 0;
+  padding: 0;               /* 收起时连内距都不占，主按钮才会置中 */
+  overflow: hidden;
+  font-size: 16px;
+  opacity: 0;
+}
+.action-row.has-done .btn-done { opacity: 1; padding: 0 12px; }
+.action-row.has-done .btn-done:disabled {
   color: var(--good);
   background: color-mix(in srgb, var(--good) 12%, var(--surface));
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--good) 35%, transparent);
 }
+
 .btn-ghost {
+  height: 40px;
+  padding: 0 14px;
   background: var(--surface);
   color: var(--ink);
   font-size: 14px;
-  padding: 10px 14px;
-  border-radius: 14px;
   box-shadow: inset 0 0 0 1.5px var(--line-strong);
 }
-.btn-ghost:hover { background: var(--surface-2); }
+@media (hover: hover) {
+  .btn-ghost:hover { background: var(--surface-2); }
+}
 .btn-ghost.danger { color: var(--bad); }
-.btn:disabled { cursor: default; }
 
 .stat, .hint {
   text-align: center;
@@ -515,10 +546,11 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   border-radius: 18px;
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 3px 0 var(--line-strong), var(--shadow-sm);
-  transition: transform .25s var(--ease-spring), box-shadow .2s, background-color .2s;
+  box-shadow: inset 0 0 0 2px transparent, 0 3px 0 var(--line-strong);
+  transition: transform .35s var(--ease-spring), box-shadow .3s ease, background-color .3s ease;
 }
 .type-tile[data-type="dare"] { --c1: var(--dare); }
+.type-tile b { transition: color .3s ease; }
 .type-tile .t-emoji { font-size: 28px; line-height: 1; }
 .type-tile .t-text {
   display: flex;
@@ -535,7 +567,10 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   text-transform: uppercase;
   color: var(--ink-soft);
 }
-.type-tile:hover { transform: translateY(-1px); }
+@media (hover: hover) {
+  .type-tile:hover { transform: translateY(-1px); }
+}
+.type-tile:active { transform: scale(.97); transition-duration: .08s; }
 .type-tile[aria-pressed="true"] {
   background: color-mix(in srgb, var(--c1) 11%, var(--surface));
   box-shadow: inset 0 0 0 2px var(--c1), 0 3px 0 color-mix(in srgb, var(--c1) 40%, transparent);
@@ -567,10 +602,28 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
+.level-picker { position: relative; }
+.level-picker .seg-indicator {
+  position: absolute;
+  top: 4px; bottom: 4px; left: 4px;
+  width: calc(50% - 6px);
+  border-radius: 11px;
+  background: var(--raised);
+  box-shadow: var(--shadow-sm);
+  transition: transform .45s var(--ease-spring);
+}
+.level-picker[data-level="advanced"] .seg-indicator { transform: translateX(calc(100% + 4px)); }
+.level-picker button { position: relative; z-index: 1; }
+.level-picker button[aria-pressed="true"] { background: transparent; box-shadow: none; }
 .level-picker button[data-level="normal"][aria-pressed="true"] { color: var(--good); }
 .level-picker button[data-level="advanced"][aria-pressed="true"] { color: var(--bad); }
 
 /* ---------- 真心话大冒险：翻牌 ---------- */
+@property --c1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #4A77C8;
+}
 .flip-stage {
   display: flex;
   justify-content: center;
@@ -586,7 +639,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   cursor: pointer;
   outline-offset: 6px;
   perspective: 1200px;
-  transition: transform .3s var(--ease-spring);
+  transition: transform .3s var(--ease-spring), --c1 .5s ease;
   -webkit-user-select: none;
   user-select: none;
   touch-action: manipulation;
@@ -823,7 +876,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
   gap: 10px;
 }
 .add-row small { color: var(--ink-soft); font-size: 12px; }
-.add-row .btn { padding: 10px 18px; border-radius: 14px; flex: none; box-shadow: 0 3px 0 var(--accent-deep); }
+.add-row .btn { height: 40px; padding: 0 18px; flex: none; }
 
 .list-head {
   display: flex;
@@ -1002,7 +1055,7 @@ body[data-mode="party"] .mode-indicator { transform: translateX(100%); }
 @media (max-width: 370px) {
   .mode-text small { display: none; }
   .mode-emoji { font-size: 20px; }
-  .btn-xl { min-width: 0; width: 100%; }
+  .btn-xl { padding: 0 20px; }
 }
 @media (max-height: 700px) {
   .panel-head { margin: 12px 0 10px; }

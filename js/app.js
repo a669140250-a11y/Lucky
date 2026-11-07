@@ -93,7 +93,45 @@
     return cat === 'daily' ? DATA.daily : DATA[cat][level];
   }
 
-  /* ---------------- 随机抽签（洗牌袋：一轮抽完才会重复） ---------------- */
+  /* ---------------- 随机抽签 ----------------
+     1. 一轮抽完才会重复，而且进度存在本机：重新打开页面也接着上次抽，不会每次都从头洗牌
+     2. 每次随机挑几张没抽过的候选，避开和最近几题“讲同一件事”的（例如连续两题都跟手机或前任有关）
+     3. “现在干嘛”还会尽量避开和上一张同一个分类
+  */
+  var HISTORY_KEY = 'lucky.history.v1';
+  var RECENT_SIZE = 6;          // 记住最近几题，用来避开相似题
+  var CANDIDATES = 8;           // 每次从没抽过的题里随机挑几张来比较
+  var SIMILAR = 0.16;           // 相似度高于这个值就尽量避开
+  var TOPIC_GAP = 2;            // 同一个话题至少隔几题再出现
+
+  // 话题关键词：字面不同、但讲的是同一件事（例如都跟手机有关）的题目也能认出来；自定义题目同样适用
+  var TOPICS = [
+    /手机|相册|截屏|搜索记录|浏览器|聊天列表|聊天记录|订单|关注列表|壁纸|App/,
+    /发消息|发一条|发一个|朋友圈|签名|昵称|头像|社交/,
+    /打电话|视频电话|通讯录/,
+    /前任|复合|甩/,
+    /暗恋|喜欢的人|告白|表白|约会|恋爱|另一半|心动|情话|情歌|情诗|情书|求婚|撩|桃花|一见钟情|理想型|结婚|婚礼/,
+    /拥抱|牵手|慢舞|公主抱|按摩|背起|背靠背/,
+    /唱|歌/,
+    /模仿|表演|演出/,
+    /夸|称赞|赞美|欣赏/,
+    /秘密|黑历史|不想让|不想被|抓包|丢脸|尴尬|糗/,
+    /爸妈|家人|父母/,
+    /最近一次/,
+    /吃|食物|零食|饮料|奶茶|水果|巧克力|早餐|菜/,
+    /维持|保留到|保持 24|直到下一轮|直到游戏结束|到下一轮结束/,
+    /画|涂鸦/,
+    /开合跳|深蹲|俯卧撑|平板支撑|伸展|瑜伽|跳舞|舞蹈|跳一段/,
+    /照片|自拍|拍一张|合照/,
+    /外语|单词|成语|古诗|百科|科普|播客/
+  ];
+
+  function topicsOf(text) {
+    var mask = 0;
+    TOPICS.forEach(function (re, i) { if (re.test(text)) mask |= 1 << i; });
+    return mask;
+  }
+
   function randInt(n) {
     if (window.crypto && window.crypto.getRandomValues) {
       var buf = new Uint32Array(1);
@@ -111,14 +149,17 @@
     return arr;
   }
 
-  var poolVersion = 0;      // 题库或设置变动时 +1，让洗牌袋重新洗
-  var bags = {};
-  var lastDrawn = {};
+  var drawHistory = (function () {
+    var raw = storage.get(HISTORY_KEY, {});
+    return raw && typeof raw === 'object' ? raw : {};
+  })();
+  var poolVersion = 0;      // 题库或设置变动时 +1，重新计算相似度用的词频
+  var simCache = {};
   var warned = {};
 
   function invalidatePools() {
     poolVersion++;
-    bags = {};
+    simCache = {};
     warned = {};
   }
 
@@ -141,19 +182,106 @@
     return { pool: builtin.concat(custom), fallback: false };
   }
 
-  function drawFrom(key, pool) {
-    var bag = bags[key];
-    if (!bag || bag.length === 0) {
-      bag = shuffle(pool.slice());
-      // 避免新一轮的第一张刚好和上一张一样
-      var last = lastDrawn[key];
-      if (last && bag.length > 1 && bag[bag.length - 1].text === last) {
-        var tmp = bag[0]; bag[0] = bag[bag.length - 1]; bag[bag.length - 1] = tmp;
-      }
-      bags[key] = bag;
+  // 把题目拆成相邻两个字的组合（去掉标点、数字和 emoji），用来比较两题是不是在讲同一件事
+  function bigrams(text) {
+    var s = text.replace(/[^一-鿿A-Za-z]/g, '');
+    var seen = {};
+    var out = [];
+    for (var i = 0; i < s.length - 1; i++) {
+      var g = s.substr(i, 2);
+      if (!seen[g]) { seen[g] = true; out.push(g); }
     }
-    var item = bag.pop();
-    lastDrawn[key] = item.text;
+    return out;
+  }
+
+  // “什么”“在场”这类每题都有的词权重很低，“前任”“相册”这类少见的词权重高
+  function similarityIndex(key, pool) {
+    var cached = simCache[key];
+    if (cached && cached.size === pool.length) return cached;
+    var grams = {};
+    var df = {};
+    pool.forEach(function (item) {
+      var g = bigrams(item.text);
+      grams[item.text] = g;
+      g.forEach(function (x) { df[x] = (df[x] || 0) + 1; });
+    });
+    var idf = {};
+    Object.keys(df).forEach(function (x) { idf[x] = Math.log((pool.length + 1) / df[x]); });
+    var topics = {};
+    pool.forEach(function (item) { topics[item.text] = topicsOf(item.text); });
+    cached = { size: pool.length, grams: grams, idf: idf, topics: topics };
+    simCache[key] = cached;
+    return cached;
+  }
+
+  function similarity(index, a, b) {
+    var ga = index.grams[a] || bigrams(a);
+    var gb = index.grams[b] || bigrams(b);
+    if (!ga.length || !gb.length) return 0;
+    var setB = {};
+    gb.forEach(function (x) { setB[x] = true; });
+    var shared = 0;
+    var total = 0;
+    ga.forEach(function (x) {
+      var w = index.idf[x] || 0;
+      total += w;
+      if (setB[x]) shared += w;
+    });
+    gb.forEach(function (x) { total += index.idf[x] || 0; });
+    total -= shared;   // 并集
+    return total > 0 ? shared / total : 0;
+  }
+
+  function saveHistory() { storage.set(HISTORY_KEY, drawHistory); }
+
+  function drawFrom(key, pool) {
+    var h = drawHistory[key];
+    if (!h || !Array.isArray(h.seen) || !Array.isArray(h.recent)) h = drawHistory[key] = { seen: [], recent: [] };
+
+    var seen = {};
+    h.seen.forEach(function (t) { seen[t] = true; });
+    var unseen = pool.filter(function (item) { return !seen[item.text]; });
+
+    if (!unseen.length) {
+      // 全部抽过一轮了 → 重新开始，但最近抽过的几张先不放回来
+      h.seen = [];
+      var hold = {};
+      h.recent.slice(-Math.min(RECENT_SIZE, Math.floor(pool.length / 2))).forEach(function (t) { hold[t] = true; });
+      unseen = pool.filter(function (item) { return !hold[item.text]; });
+      if (!unseen.length) unseen = pool.slice();
+    }
+
+    var index = similarityIndex(key, pool);
+    var byText = {};
+    pool.forEach(function (item) { byText[item.text] = item; });
+    var recent = h.recent.filter(function (t) { return byText[t]; });
+    var lastCat = recent.length ? byText[recent[recent.length - 1]].cat : null;
+
+    // 随机挑几张候选，算出各自和最近几题有多像
+    var candidates = shuffle(unseen.slice()).slice(0, CANDIDATES).map(function (item) {
+      var score = 0;
+      recent.forEach(function (t, k) {
+        var age = recent.length - 1 - k;                     // 0 = 上一题
+        var weight = 1 - age * 0.12;                         // 越近的题影响越大
+        score = Math.max(score, similarity(index, item.text, t) * weight);
+        if (age < TOPIC_GAP && (index.topics[item.text] & index.topics[t])) score = Math.max(score, SIMILAR + 0.05);
+      });
+      if (item.cat && lastCat && item.cat === lastCat) score += SIMILAR;   // 同分类算作“有点像”
+      return { item: item, score: score };
+    });
+    // 在“不像”的候选里随机选一张；都很像就选最不像的
+    var fresh = candidates.filter(function (c) { return c.score < SIMILAR; });
+    var chosen = fresh.length
+      ? fresh[0]
+      : candidates.reduce(function (a, b) { return b.score < a.score ? b : a; });
+
+    var item = chosen.item;
+    h.seen.push(item.text);
+    h.recent.push(item.text);
+    if (h.recent.length > RECENT_SIZE) h.recent = h.recent.slice(-RECENT_SIZE);
+    // 被删掉的自定义题目不用一直记着
+    h.seen = h.seen.filter(function (t) { return byText[t]; });
+    saveHistory();
     return item;
   }
 
@@ -184,6 +312,32 @@
 
   function stopAnimations(el) {
     if (el.getAnimations) el.getAnimations().forEach(function (a) { a.cancel(); });
+  }
+
+  // 换文字时先淡出、再从下面淡入；连续快速切换时以最后一次为准
+  function swapText(el, text, animated) {
+    var pending = el.__nextText;
+    if ((pending !== undefined ? pending : el.textContent) === text) return;
+    if (!animated || !el.animate || reduceMotion.matches) {
+      el.__nextText = undefined;
+      stopAnimations(el);
+      el.textContent = text;
+      return;
+    }
+    el.__nextText = text;
+    stopAnimations(el);
+    el.animate([
+      { opacity: 1, transform: 'none' },
+      { opacity: 0, transform: 'translateY(-5px)' }
+    ], { duration: 110, easing: 'ease-in', fill: 'forwards' }).finished.then(function () {
+      el.textContent = el.__nextText;
+      el.__nextText = undefined;
+      stopAnimations(el);
+      el.animate([
+        { opacity: 0, transform: 'translateY(5px)' },
+        { opacity: 1, transform: 'none' }
+      ], { duration: 220, easing: 'cubic-bezier(.2, .8, .3, 1)' });
+    }, function () {});
   }
 
   function vibrate(pattern) {
@@ -303,6 +457,7 @@
   var taskEmoji = $('#taskEmoji');
   var drawDailyBtn = $('#drawDaily');
   var doneBtn = $('#doneDaily');
+  var dailyActions = $('#dailyActions');
   var dailyToken = 0;       // 每抽一次 +1；旧的动画看到号码不同就自动退场
   var dailyHasCard = false;
 
@@ -325,6 +480,14 @@
     var token = ++dailyToken;
     var item = drawItem('daily');
     vibrate(10);
+    // 骰子滚一圈
+    var dice = $('.btn-icon', drawDailyBtn);
+    stopAnimations(dice);
+    animate(dice, [
+      { transform: 'none' },
+      { transform: 'rotate(380deg) scale(1.15)', offset: 0.7 },
+      { transform: 'rotate(360deg)' }
+    ], { duration: 520, easing: 'cubic-bezier(.2, .7, .3, 1)' });
 
     // 从卡片“现在的样子”开始退场，就算上一张还在飞也不会跳一下
     var cs = getComputedStyle(taskCard);
@@ -345,10 +508,12 @@
       if (token !== dailyToken) return;
       renderTask(item);
       dailyHasCard = true;
-      $('.btn-label', drawDailyBtn).textContent = '再抽一张';
-      doneBtn.hidden = false;
+      swapText($('.btn-label', drawDailyBtn), '再抽一张', true);
+      dailyActions.classList.add('has-done');
       doneBtn.disabled = false;
-      $('.btn-label', doneBtn).textContent = '完成了！';
+      doneBtn.tabIndex = 0;
+      doneBtn.removeAttribute('aria-hidden');
+      swapText($('.btn-label', doneBtn), '完成', true);
       announce('抽到任务：' + item.text);
 
       stopAnimations(taskEmoji);
@@ -375,7 +540,7 @@
     renderDoneCount();
     taskCard.classList.add('is-done');
     doneBtn.disabled = true;
-    $('.btn-label', doneBtn).textContent = '已完成，抽下一个吧';
+    swapText($('.btn-label', doneBtn), '已完成', true);
     vibrate([12, 40, 18]);
     var rect = doneBtn.getBoundingClientRect();
     confetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
@@ -396,6 +561,7 @@
   var faceCover = $('.face-cover', flipCard);
   var faceContent = $('#faceContent');
   var drawPartyBtn = $('#drawParty');
+  var levelPicker = $('#levelPicker');
   var flipped = false;      // 目前停在题目面
   var spinning = false;     // 翻牌动画进行中
   var queuedDraw = false;   // 动画中又按了一次 → 这次翻完马上再抽
@@ -408,7 +574,7 @@
     // 题目 → 转一整圈 → 新题目：曲线必须前后对称，转到一半时刚好背面朝前，在那一刻换题
     redraw: { from: 180, to: 540, duration: 760, easing: 'cubic-bezier(.65, 0, .35, 1)' },
     // 题目 → 背面
-    hide: { from: 180, to: 0, duration: 420, easing: 'cubic-bezier(.5, 0, .3, 1)' }
+    hide: { from: 180, to: 0, duration: 480, easing: 'cubic-bezier(.45, .05, .25, 1)' }
   };
 
   function setFlipped(value) {
@@ -419,16 +585,34 @@
     flipCard.setAttribute('aria-label', value ? '再抽一张' : '翻牌');
   }
 
-  function renderPicker() {
+  function renderPicker(animated) {
     $$('.type-tile').forEach(function (btn) {
       btn.setAttribute('aria-pressed', String(btn.dataset.type === settings.type));
     });
     $$('.level-picker button').forEach(function (btn) {
       btn.setAttribute('aria-pressed', String(btn.dataset.level === settings.level));
     });
-    flipCard.dataset.type = settings.type;
-    $('#coverTitle').textContent = NAME[settings.type];
-    $('#coverSub').textContent = LABEL[settings.level] + ' · 点我翻牌';
+    flipCard.dataset.type = settings.type;          // 牌背颜色会平滑过渡（CSS）
+    levelPicker.dataset.level = settings.level;     // 尺度选中块滑过去（CSS）
+    var showText = animated && !flipped;             // 牌背朝前时，文字也淡出淡入
+    swapText($('#coverTitle'), NAME[settings.type], showText);
+    swapText($('#coverSub'), LABEL[settings.level] + ' · 点我翻牌', showText);
+  }
+
+  // 换类型／尺度时，牌轻轻转一下回应（往选的那一边转）
+  function nudgeCard(dir) {
+    if (flipped || spinning || !flipInner.animate || reduceMotion.matches) return;
+    flipInner.animate([
+      { transform: 'rotateY(0deg)' },
+      { transform: 'rotateY(' + (-18 * dir) + 'deg)', offset: 0.35 },
+      { transform: 'rotateY(' + (6 * dir) + 'deg)', offset: 0.72 },
+      { transform: 'rotateY(0deg)' }
+    ], { duration: 560, easing: 'ease-in-out' });
+    animate($('.cover-ring', flipCard), [
+      { transform: 'none' },
+      { transform: 'scale(.86) rotate(' + (-12 * dir) + 'deg)', offset: 0.4 },
+      { transform: 'none' }
+    ], { duration: 520, easing: 'cubic-bezier(.3, .7, .3, 1)' });
   }
 
   function spin(cfg, atMidpoint) {
@@ -495,7 +679,11 @@
     var count = ++partyCount;
     var fill = function () { showQuestion(item, type, level, count); };
     vibrate(12);
-    $('.btn-label', drawPartyBtn).textContent = '再抽一张';
+    swapText($('.btn-label', drawPartyBtn), '再抽一张', true);
+    animate($('.btn-icon', drawPartyBtn), [
+      { transform: 'perspective(200px) rotateY(0deg)' },
+      { transform: 'perspective(200px) rotateY(360deg)' }
+    ], { duration: 600, easing: 'cubic-bezier(.4, 0, .2, 1)' });
     announce(NAME[type] + '：' + item.text);
 
     var done;
@@ -510,7 +698,7 @@
 
   function hideCard() {
     if (!flipped || spinning) return;
-    $('.btn-label', drawPartyBtn).textContent = '翻牌！';
+    swapText($('.btn-label', drawPartyBtn), '翻牌！', true);
     spin(SPIN.hide).then(afterSpin);
   }
 
@@ -528,9 +716,11 @@
     if (settings[key] === value) return;
     settings[key] = value;
     saveSettings();
-    renderPicker();
-    // 换类型或尺度时，把牌翻回背面，等待下一次翻牌
+    renderPicker(true);
+    // 换类型或尺度时：题目面朝前 → 翻回背面；背面朝前 → 牌轻轻转一下
+    var dir = (key === 'type' ? value === 'dare' : value === 'advanced') ? 1 : -1;
     if (flipped && !spinning) hideCard();
+    else nudgeCard(dir);
   }
 
   $$('.type-tile').forEach(function (btn) {
@@ -857,6 +1047,6 @@
 
   /* ---------------- 初始化 ---------------- */
   setMode(settings.mode);
-  renderPicker();
+  renderPicker(false);
   renderDoneCount();
 })();

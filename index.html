@@ -68,12 +68,14 @@
         </div>
 
         <div class="actions">
-          <button class="btn btn-primary btn-xl" id="drawDaily" type="button">
-            <span aria-hidden="true">🎲</span><span class="btn-label">抽一张</span>
-          </button>
-          <button class="btn btn-soft" id="doneDaily" type="button" hidden>
-            <span aria-hidden="true">✅</span><span class="btn-label">完成了！</span>
-          </button>
+          <div class="action-row" id="dailyActions">
+            <button class="btn btn-soft btn-done" id="doneDaily" type="button" tabindex="-1" aria-hidden="true" disabled>
+              <span class="btn-icon" aria-hidden="true">✅</span><span class="btn-label">完成</span>
+            </button>
+            <button class="btn btn-primary btn-xl" id="drawDaily" type="button">
+              <span class="btn-icon" aria-hidden="true">🎲</span><span class="btn-label">抽一张</span>
+            </button>
+          </div>
         </div>
         <p class="stat">已完成 <b id="doneCount">0</b> 个小任务</p>
       </section>
@@ -94,7 +96,8 @@
               <span class="t-emoji" aria-hidden="true">🔥</span><span class="t-text"><b>大冒险</b><small>Dare</small></span>
             </button>
           </div>
-          <div class="seg level-picker" role="group" aria-label="尺度等级">
+          <div class="seg level-picker" id="levelPicker" data-level="normal" role="group" aria-label="尺度等级">
+            <span class="seg-indicator" aria-hidden="true"></span>
             <button type="button" data-level="normal" aria-pressed="true">🌱 普通</button>
             <button type="button" data-level="advanced" aria-pressed="false">🌶️ 进阶</button>
           </div>
@@ -123,7 +126,7 @@
 
         <div class="actions">
           <button class="btn btn-primary btn-xl" id="drawParty" type="button">
-            <span aria-hidden="true">🃏</span><span class="btn-label">翻牌！</span>
+            <span class="btn-icon" aria-hidden="true">🃏</span><span class="btn-label">翻牌！</span>
           </button>
         </div>
         <p class="hint">玩得开心也要尊重彼此，任何人都可以说“Pass”🙌</p>
